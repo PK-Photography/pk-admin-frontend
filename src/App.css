@@ -1,0 +1,34 @@
+/* Make sure CKEditor popups appear above the Material-UI Dialog */
+/* .ck.ck-balloon-panel {
+    z-index: 1500 !important;
+  }
+  
+  .MuiDialog-root {
+    z-index: 1300;
+  } */
+  
+  p {
+    margin: 0;
+  }
+  .custom-render p {
+    margin: 0;
+  }
+  ul, ol {
+    margin: 0;
+    padding-left: 20px; /* Optional: Adjust to customize indentation */
+  }
+  
+  li {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .custom-render ul, .custom-render ol {
+    margin: 0;
+    padding-left: 20px;
+  }
+  
+  .custom-render li {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+    
