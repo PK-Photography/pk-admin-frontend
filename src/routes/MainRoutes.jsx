@@ -5,6 +5,11 @@ import { Outlet } from "react-router-dom";
 import Loadable from "components/Loadable";
 import Dashboard from "layout/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import Bookings from "pages/Bookings";
+import Clients from "pages/Clients";
+import AdminManage from "pages/AdminManage";
+import HomePageCarousel from "pages/HomePageCarousel";
+import Reviews from "pages/Reviews";
 // import AdminManage from "pages/AdminManage";
 // import MasterProtecterRoute from "./MasterProtecterRoute";
 // import EmployeeManagement from "pages/EmployeeManagement";
@@ -43,6 +48,28 @@ const MainRoutes = {
         {
           path: "dashboard/:id",
           element: <DashboardDefault />, // Dashboard page
+        },
+    
+        {
+          path: "manage-bookings",
+          element: <Bookings />, // Dashboard page
+        },
+        {
+          path: "clients",
+          element: <Clients />, // Dashboard page
+        },
+    
+        {
+          path: "admin-management",
+          element: <AdminManage />, // Dashboard page
+        },
+        {
+          path: "/home-page-carousel",
+          element: <HomePageCarousel />, // Dashboard page
+        },
+        {
+          path: "/reviews",
+          element: <Reviews />, // Dashboard page
         },
     
       

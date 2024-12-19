@@ -1,6 +1,6 @@
 // material-ui
 import { useTheme } from "@mui/material/styles";
-import MainLogo from "../../assets/images/kindalogo.webp";
+import MainLogo from "../../assets/images/pk-logo.avif";
 
 /**
  * if you want to use image instead of <svg> uncomment following.
@@ -59,7 +59,7 @@ const Logo = () => {
       <img
         src={MainLogo}
         alt="main-logo"
-        width="125"
+        width="170"
         style={{ paddingTop: "10px" }}
         height="60"
         viewBox="0 0 118 35"

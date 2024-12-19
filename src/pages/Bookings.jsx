@@ -50,7 +50,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }));
 
-export default function EmployeeManagement() {
+export default function Bookings() {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('add'); // 'add', 'edit', 'view'
@@ -84,9 +84,9 @@ export default function EmployeeManagement() {
     axiosInstance
       .get('/booking/all') // API to fetch employee data
       .then((response) => {
-        const booking = response.data; // Assuming the response is an array of employees
+        const booking = response.data.data; // Assuming the response is an array of employees
         console.log(booking);
-        setJobs(booking); // Store the employee data in the state
+        setData(booking); // Store the employee data in the state
         setLoading(false); // Stop loading
       })
       .catch((error) => {
@@ -109,7 +109,7 @@ export default function EmployeeManagement() {
     setDialogData(job);
 
     setTimeout(() => {
-      setEmployeeData({
+      setBookingData({
         name: data.name || '',
         email: data.email || '',
         phone: data.phone || '',
@@ -158,10 +158,10 @@ export default function EmployeeManagement() {
 
     try {
       if (dialogMode === 'add') {
-        await axiosInstance.post('/employees', employeeData);
+        await axiosInstance.post('/employees', bookingData);
         toast.success('Employee added successfully!🎉');
       } else if (dialogMode === 'edit') {
-        await axiosInstance.put(`/employees/${dialogData.id}`, employeeData);
+        await axiosInstance.put(`/employees/${dialogData.id}`, bookingData);
         toast.success('Employee updated successfully!🖊️😍');
       }
 
@@ -189,32 +189,13 @@ export default function EmployeeManagement() {
       setJobToDelete(null);
       toast.success('Deleted Sucessfully🥲!');
     } catch (error) {
-      console.error('Error deleting the job:', error);
-      toast.error('Something went Wrong in deleting the job!😠');
+      console.error('Error deleting..:', error);
+      toast.error('Something went Wrong in deleting!😠');
     }
   };
 
   // ################### Array of News Categories #############
 
-  const getDepartment = () => {
-    setLoading(true); // Start loading
-    axiosInstance
-      .get('/departments')
-      .then((response) => {
-        const departmentData = response.data;
-        setDepartment(departmentData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching the departments:', error);
-        toast.error('Something went wrong in fetching departments!😠', error);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    getDepartment();
-  }, []);
 
   return (
     <div>
@@ -226,7 +207,7 @@ export default function EmployeeManagement() {
       >
         <Button variant="contained" style={{ backgroundColor: '#008080' }}>
           {' '}
-          Add New Employee
+          Add New Booking
         </Button>
       </h3>
 
@@ -258,7 +239,7 @@ export default function EmployeeManagement() {
                 color: '#008080'
               }}
             >
-              Loading employees...
+              Loading Bookings...
             </div>
           ) : (
             <TableBody>
@@ -372,8 +353,8 @@ export default function EmployeeManagement() {
                 label="Employee ID"
                 fullWidth
                 variant="outlined"
-                value={employeeData.employeeId}
-                onChange={(e) => setEmployeeData({ ...employeeData, employeeId: e.target.value })}
+                value={bookingData.employeeId}
+                onChange={(e) => setBookingData({ ...bookingData, employeeId: e.target.value })}
                 required
               />
             </>
@@ -402,7 +383,7 @@ export default function EmployeeManagement() {
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Delete Job</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete the job titled "{dialogData.firstName}"?</Typography>
+          <Typography>Are you sure you want to delete this Data "{dialogData.name}"?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>

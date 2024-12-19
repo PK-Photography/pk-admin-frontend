@@ -37,48 +37,49 @@ const components = {
   type: "group",
   children: [
     {
-      id: "employee-management",
-      title: "Manage Employees",
+      id: "clients",
+      title: "Clients",
       type: "item",
-      url: "/employee-management",
-      icon: icons.RocketOutlined,
-    },
-    {
-      id: "manage-department",
-      title: "Manage Department",
-      type: "item",
-      url: "/manage-department",
+      url: "/clients",
       icon: icons.DollarOutlined,
     },
     {
-      id: "Attendance",
-      title: "Attendance",
+      id: "manage-bookings",
+      title: "Manage Bookings",
       type: "item",
-      url: "/attendance",
+      url: "/manage-bookings",
+      icon: icons.RocketOutlined,
+    },
+    
+    {
+      id: "home-page-carousel",
+      title: "Home Page Carousel",
+      type: "item",
+      url: "/home-page-carousel",
       icon: icons.ReadOutlined,
     },
     {
-      id: "employeesdeatails",
-      title: "Employees Details",
+      id: "reviews",
+      title: "Reviews",
       type: "item",
-      url: "/employees-deatails",
+      url: "/reviews",
       icon: icons.GlobalOutlined,
     },
-    {
-      id: "apply-leave",
-      title: "Apply Leave",
-      type: "item",
-      url: "/apply-leave",
-      icon: icons.KeyOutlined,
-    },
+    // {
+    //   id: "apply-leave",
+    //   title: "Apply Leave",
+    //   type: "item",
+    //   url: "/apply-leave",
+    //   icon: icons.KeyOutlined,
+    // },
 
-    {
-      id: "manage-leaves",
-      title: "Manage Leaves",
-      type: "item",
-      url: "/manage-leaves",
-      icon: icons.BarcodeOutlined,
-    },
+    // {
+    //   id: "manage-leaves",
+    //   title: "Manage Leaves",
+    //   type: "item",
+    //   url: "/manage-leaves",
+    //   icon: icons.BarcodeOutlined,
+    // },
 
 
     // {

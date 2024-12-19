@@ -85,21 +85,21 @@ export default function AuthLogin({ isDemo = false }) {
         password: values.password,
       });
   
-      if (response.data.message === "Login successful") {
-        // Extract token and role from the response
-        const { token, data } = response.data;
+      if (response.data.status === "success") {
+        // Extract accessToken and admin details from the response
+        const { accessToken, admin } = response.data;
   
-        // Store the accessToken and role in localStorage
-        localStorage.setItem("accessToken", token);
-        localStorage.setItem("role", data.role);
+        // Store the accessToken and admin email in localStorage
+        localStorage.setItem("accessToken", accessToken);
+        // localStorage.setItem("adminEmail", admin.email);
   
-        // Show success alert
+        // Show success toast notification
         toast.success("Login Successfully!");
   
         // Redirect to dashboard
         navigate("/dashboard");
       } else {
-        throw new Error("Unexpected response from the server");
+        throw new Error(response.data.message || "Unexpected response from the server");
       }
     } catch (error) {
       // Handle errors appropriately
@@ -110,7 +110,6 @@ export default function AuthLogin({ isDemo = false }) {
     }
   };
   
-
   return (
     <>
       {/* Show success alert if login is successful */}
