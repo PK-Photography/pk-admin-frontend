@@ -68,7 +68,7 @@ export default function Bookings() {
 
   const [alertOpen, setAlertOpen] = useState(false); // Alert for isMarquee
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
-  const [jobToDelete, setJobToDelete] = useState(null); // Job to delete
+  const [dataToDelete, setDataToDelete] = useState(null); // Job to delete
   const [loading, setLoading] = useState(false); //loading state
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [pendingCloseAction, setPendingCloseAction] = useState(null);
@@ -76,16 +76,16 @@ export default function Bookings() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    fetchEmployees();
+    fetchAllBookings();
   }, []);
 
-  const fetchEmployees = () => {
+  const fetchAllBookings = () => {
     setLoading(true); // Start loading
     axiosInstance
       .get('/booking/all') // API to fetch employee data
       .then((response) => {
         const booking = response.data.data; // Assuming the response is an array of employees
-        console.log(booking);
+
         setData(booking); // Store the employee data in the state
         setLoading(false); // Stop loading
       })
@@ -110,20 +110,24 @@ export default function Bookings() {
 
     setTimeout(() => {
       setBookingData({
-        name: data.name || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        address: data.address || '',
-        message: data.message || '',
-        service: data.service || '',
-        date: data.date || '',
-        time: data.time || ''
+        name: job.name || '',
+        email: job.email || '',
+        phone: job.phone || '',
+        address: job.address || '',
+        message: job.message || '',
+        service: job.service || '',
+        date: job.date || '',
+        time: job.time || ''
       });
 
       toast.dismiss(loadingToastId);
       setOpen(true);
     }, 100);
-  };
+
+
+
+  }
+
 
   const handleClose = (action = null) => {
     if (dialogMode === 'view') {
@@ -158,14 +162,15 @@ export default function Bookings() {
 
     try {
       if (dialogMode === 'add') {
-        await axiosInstance.post('/employees', bookingData);
-        toast.success('Employee added successfully!🎉');
+        await axiosInstance.post('/booking/request', bookingData);
+        toast.success('Booking added successfully!🎉');
       } else if (dialogMode === 'edit') {
-        await axiosInstance.put(`/employees/${dialogData.id}`, bookingData);
-        toast.success('Employee updated successfully!🖊️😍');
+        await axiosInstance.put(`/booking/${dialogData._id}`, bookingData);
+
+        toast.success('Booking updated successfully!🖊️😍');
       }
 
-      fetchEmployees(); // Refresh the data
+      fetchAllBookings(); // Refresh the data
       handleClose(); // Close the dialog
 
       toast.dismiss(loadingToastId); // Dismiss loading toast after success
@@ -177,16 +182,16 @@ export default function Bookings() {
   };
 
   const handleDeleteDialogOpen = (job) => {
-    setJobToDelete(job);
+    setDataToDelete(job);
     setDeleteDialogOpen(true);
   };
 
   const handleDelete = async () => {
     try {
-      await axiosInstance.delete(`/employees/${jobToDelete.id}`);
-      fetchEmployees();
+      await axiosInstance.delete(`/booking/${dataToDelete._id}`);
+      fetchAllBookings();
       setDeleteDialogOpen(false);
-      setJobToDelete(null);
+      setDataToDelete(null);
       toast.success('Deleted Sucessfully🥲!');
     } catch (error) {
       console.error('Error deleting..:', error);
@@ -195,6 +200,7 @@ export default function Bookings() {
   };
 
   // ################### Array of News Categories #############
+
 
 
   return (
@@ -226,7 +232,7 @@ export default function Bookings() {
               <StyledTableCell>phone</StyledTableCell>
               <StyledTableCell>address</StyledTableCell>
               <StyledTableCell>service</StyledTableCell>
-             
+
 
               <StyledTableCell align="right">Action</StyledTableCell>
             </TableRow>
@@ -263,7 +269,7 @@ export default function Bookings() {
                   <StyledTableCell component="th" scope="row">
                     {job.service}
                   </StyledTableCell>
-                 
+
                   {/* <StyledTableCell component="th" scope="row">
                     {new Date(job.dateOfJoining).toLocaleString('en-GB', {
                       day: '2-digit',
@@ -314,49 +320,286 @@ export default function Bookings() {
         disableBackdropClick
         maxWidth="md"
       >
-        <DialogTitle>{dialogMode === 'add' ? 'Add Employee' : dialogMode === 'edit' ? 'Edit Employee' : 'Job Details'}</DialogTitle>
+        <DialogTitle>{dialogMode === 'add' ? 'Add Booking' : dialogMode === 'edit' ? 'Edit Booking' : 'Job Details'}</DialogTitle>
         <DialogContent>
           {dialogMode === 'view' ? (
             <>
-              {/* First Name and Last Name */}
-              <Grid container spacing={2}>
+              {/* First Name and Last Name
+              <Grid container spacing={2} style={{ minWidth: "500px", padding: "10px" }}>
                 <Grid item xs={6}>
                   <p>
-                    <strong style={{ fontSize: '18px', color: '#008080' }}>First Name:</strong>
-                    <h3>{dialogData.firstName}</h3>
+                    <strong style={{ fontSize: '18px', color: '#008080' }}>Name:</strong>
+                    <h3>{dialogData.name}</h3>
                   </p>
                 </Grid>
+
                 <Grid item xs={6}>
                   <p>
-                    <strong style={{ fontSize: '18px', color: '#008080' }}>Last Name:</strong>
-                    <h3>{dialogData.lastName}</h3>
+                    <strong style={{ fontSize: '18px', color: '#008080' }}>Email:</strong>
+                    <h3>{dialogData.email}</h3>
                   </p>
                 </Grid>
               </Grid>
-              <hr />
+              <hr /> */}
+
+
+              <>
+                {/* First Name and Last Name */}
+                <Grid container spacing={2} style={{ minWidth: "500px", padding: "10px" }}>
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Name:</strong>
+                      <h3>{dialogData.name}</h3>
+                    </p>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Email:</strong>
+                      <h3>{dialogData.email}</h3>
+                    </p>
+                  </Grid>
+                </Grid>
+
+                {/* Phone and Address */}
+                <Grid container spacing={2} style={{ minWidth: "500px", padding: "10px" }}>
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Phone:</strong>
+                      <h3>{dialogData.phone}</h3>
+                    </p>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Address:</strong>
+                      <h3>{dialogData.address}</h3>
+                    </p>
+                  </Grid>
+                </Grid>
+
+                {/* Message and Service */}
+                <Grid container spacing={2} style={{ minWidth: "500px", padding: "10px" }}>
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Message:</strong>
+                      <h3>{dialogData.message}</h3>
+                    </p>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Service:</strong>
+                      <h3>{dialogData.service}</h3>
+                    </p>
+                  </Grid>
+                </Grid>
+
+                {/* Date and Time */}
+                <Grid container spacing={2} style={{ minWidth: "500px", padding: "10px" }}>
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Date:</strong>
+                      <h3>{dialogData.date}</h3>
+                    </p>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <p>
+                      <strong style={{ fontSize: '18px', color: '#008080' }}>Time:</strong>
+                      <h3>{dialogData.time}</h3>
+                    </p>
+                  </Grid>
+                </Grid>
+
+                <hr />
+              </>
+
             </>
           ) : (
             <>
-              {/* Employee ID */}
+              {/* User Name */}
               <label
-                htmlFor="Employee ID"
+                htmlFor="Name"
                 style={{
                   fontSize: '15px',
                   color: '#008080',
                   fontWeight: 'bolder'
                 }}
               >
-                Employee ID
+                Name
               </label>
               <TextField
                 margin="dense"
-                label="Employee ID"
+                label="Name"
                 fullWidth
                 variant="outlined"
-                value={bookingData.employeeId}
-                onChange={(e) => setBookingData({ ...bookingData, employeeId: e.target.value })}
+                value={bookingData.name}
+                onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
                 required
               />
+
+
+              {/* Email */}
+              <label
+                htmlFor="Email"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Email
+              </label>
+              <TextField
+                margin="dense"
+                label="Email"
+                fullWidth
+                variant="outlined"
+                value={bookingData.email}
+                onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
+                required
+              />
+
+              {/* Phone */}
+              <label
+                htmlFor="Phone"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Phone
+              </label>
+              <TextField
+                margin="dense"
+                label="Phone"
+                fullWidth
+                variant="outlined"
+                value={bookingData.phone}
+                onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                required
+              />
+
+              {/* Address */}
+              <label
+                htmlFor="Address"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Address
+              </label>
+              <TextField
+                margin="dense"
+                label="Address"
+                fullWidth
+                variant="outlined"
+                value={bookingData.address}
+                onChange={(e) => setBookingData({ ...bookingData, address: e.target.value })}
+                required
+              />
+
+              {/* Message */}
+              <label
+                htmlFor="Message"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Message
+              </label>
+              <TextField
+                margin="dense"
+                label="Message"
+                fullWidth
+                variant="outlined"
+                value={bookingData.message}
+                onChange={(e) => setBookingData({ ...bookingData, message: e.target.value })}
+              />
+
+              {/* Service */}
+              <label
+                htmlFor="Service"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Service
+              </label>
+              <TextField
+                select
+                margin="dense"
+                label="Service"
+                fullWidth
+                variant="outlined"
+                value={bookingData.service}
+                onChange={(e) => setBookingData({ ...bookingData, service: e.target.value })}
+                SelectProps={{
+                  native: true,
+                }}
+                required
+              >
+                <option value="">Select a service</option>
+                <option value="Headshots">Headshots</option>
+                <option value="Portrait">Portrait</option>
+                <option value="Wedding & Events">Wedding & Events</option>
+                <option value="Interior">Interior</option>
+                <option value="Other">Other</option>
+              </TextField>
+
+              {/* Date */}
+              <label
+                htmlFor="Date"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Date
+              </label>
+              <TextField
+                type="date"
+                margin="dense"
+                fullWidth
+                variant="outlined"
+                value={bookingData.date}
+                onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                required
+              />
+
+              {/* Time */}
+              <label
+                htmlFor="Time"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Time
+              </label>
+              <TextField
+                type="time"
+                margin="dense"
+                fullWidth
+                variant="outlined"
+                value={bookingData.time}
+                onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                required
+              />
+
+
+
+
             </>
           )}
         </DialogContent>
