@@ -29,10 +29,10 @@ import {
     Alert,
     Select,
     MenuItem,
+    CircularProgress,
 } from "@mui/material";
 import toast from "react-hot-toast";
 import axiosInstance from "utils/axiosInstance";
-import { date } from "yup";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -66,7 +66,7 @@ export default function Clients() {
     const [dialogData, setDialogData] = useState({});
     const [formValues, setFormValues] = useState({
         name: "",
-        date: "",
+
 
         imageUrl: null,
 
@@ -80,7 +80,10 @@ export default function Clients() {
     const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
     const [pendingCloseAction, setPendingCloseAction] = useState(null);
     const [orderNo, setOrderNo] = useState(null);
-
+    const [loading, setLoading] = useState(false);
+    const [categoryName, setCategoryName] = useState(""); // New category name
+    const [deriveLink, setDeriveLink] = useState(""); // New category image link
+    const [selectedClientId, setSelectedClientId] = useState("");
     useEffect(() => {
         fetchNews(page, rowsPerPage);
     }, [page, rowsPerPage]);
@@ -131,7 +134,7 @@ export default function Clients() {
                 date: job.date || "",
                 imageUrl: job.image || null,
                 category: job.category || "",
-                date: job.date || ""
+
             });
 
             toast.dismiss(loadingToastId);
@@ -160,52 +163,105 @@ export default function Clients() {
         setConfirmCloseOpen(false); // Close the confirmation dialog
     };
 
+    // const handleSubmit = async () => {
+    //     try {
+
+    //         if (dialogMode === "add") {
+    //             const cardData = {
+    //                 name: formValues.name,
+    //                 date: formValues.date,
+    //                 image: formValues.image, // Assuming the image will be converted to base64
+    //             };
+
+    //             try {
+    //                 await axiosInstance.post("/upload", cardData);
+    //                 toast.success("News Posted Successfully!🎉");
+    //             } catch (error) {
+    //                 console.error(error);
+    //                 toast.error("Failed to post news. Please try again.");
+    //             }
+    //         }
+
+
+    //         else if (dialogMode === "edit") {
+    //             const cardData = {
+    //                 name: formValues.name,
+    //                 date: formValues.date,
+    //                 image: formValues.image, // Assuming the image will be converted to base64
+    //             };
+
+
+    //             await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
+    //                 headers: { "Content-Type": "multipart/form-data" },
+    //             });
+    //             toast.success("News Edited Successfully!🖊️😍");
+    //         } else if (dialogMode === "editOrder") {
+    //             const updatedOrder = {
+    //                 orderNumber: formValues.orderNumber,
+    //             };
+
+    //             await axiosInstance.put(`/news/order/${dialogData._id}`, updatedOrder, {
+    //                 headers: { "Content-Type": "application/json" },
+    //             });
+    //             toast.success("Order updated Successfully!🖊️😍");
+    //         }
+
+    //         fetchNews(page, rowsPerPage); // Refresh the data
+    //         handleClose();
+    //     } catch (error) {
+    //         console.error("Error submitting the form:", error);
+    //         toast.error(`Error: ${error.response?.data?.message || "Unknown error"}`);
+    //     }
+    // };
+
     const handleSubmit = async () => {
+        const loadingToast = toast.loading("Processing your request..."); // Show a loading toast
         try {
             if (dialogMode === "add") {
-                const formData = new FormData();
-                formData.append("title", formValues.title);
-                formData.append("description", formValues.description);
-                formData.append("appDescription", formValues.appDescription);
-                formData.append("image", formValues.image); // Append the image file
-                formData.append("url", formValues.url);
-                formData.append("category", formValues.category || "others");
-                formData.append("source", formValues.source);
-                formData.append("isMarquee", formValues.isMarquee);
-                formData.append("isActive", formValues.isActive);
-                formData.append("orderNumber", formValues.orderNumber);
+                const cardData = {
+                    name: formValues.name,
+                    date: formValues.date,
+                    image: formValues.image, // Assuming the image will be converted to base64
+                };
 
-                await axiosInstance.post("/news/create", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
-
-                toast.success("News Posted Successfully!🎉");
+                try {
+                    await axiosInstance.post("/upload", cardData);
+                    toast.success("News Posted Successfully!🎉");
+                } catch (error) {
+                    console.error(error);
+                    toast.error("Failed to post news. Please try again.");
+                }
             } else if (dialogMode === "edit") {
-                const formData = new FormData();
-                formData.append("title", formValues.title);
-                formData.append("description", formValues.description);
-                formData.append("appDescription", formValues.appDescription);
-                formData.append("image", formValues.image);
-                formData.append("url", formValues.url);
-                formData.append("category", formValues.category || "others");
-                formData.append("source", formValues.source);
-                formData.append("isMarquee", formValues.isMarquee);
-                formData.append("isActive", formValues.isActive);
-                formData.append("orderNumber", formValues.orderNumber);
+                const cardData = {
+                    name: formValues.name,
+                    date: formValues.date,
+                    image: formValues.image, // Assuming the image will be converted to base64
+                };
 
-                await axiosInstance.put(`/news/${dialogData._id}`, formData, {
+                await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 toast.success("News Edited Successfully!🖊️😍");
             } else if (dialogMode === "editOrder") {
-                const updatedOrder = {
-                    orderNumber: formValues.orderNumber,
-                };
 
-                await axiosInstance.put(`/news/order/${dialogData._id}`, updatedOrder, {
-                    headers: { "Content-Type": "application/json" },
-                });
-                toast.success("Order updated Successfully!🖊️😍");
+                const newCategory = {
+                    name: categoryName,
+                    images: deriveLink,
+
+                };
+                await axiosInstance.put(
+                    "/cards/update-category",
+                    {
+                        id: selectedClientId,
+                        category: newCategory,
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                toast.success("Category updated Successfully!🖊️😍");
             }
 
             fetchNews(page, rowsPerPage); // Refresh the data
@@ -213,26 +269,77 @@ export default function Clients() {
         } catch (error) {
             console.error("Error submitting the form:", error);
             toast.error(`Error: ${error.response?.data?.message || "Unknown error"}`);
+        } finally {
+            toast.dismiss(loadingToast); // Dismiss the loading toast once the operation is done
         }
     };
+
+
+
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size exceeds 10MB. Please upload a smaller file.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFormValues((prev) => ({
+                ...prev,
+                image: reader.result, // Set Base64 string
+            }));
+        };
+        reader.readAsDataURL(file);
+    };
+
+
 
     const handleDeleteDialogOpen = (job) => {
         setJobToDelete(job);
         setDeleteDialogOpen(true);
     };
 
+    // const handleDelete = async () => {
+    //     try {
+    //         await axiosInstance.delete(`/cards/${jobToDelete._id}`);
+    //         fetchNews(page, rowsPerPage);
+    //         setDeleteDialogOpen(false);
+    //         setJobToDelete(null);
+    //         toast.success("Deleted Sucessfully🥲!");
+    //     } catch (error) {
+    //         console.error("Error deleting the job:", error);
+    //         toast.error("Something went Wrong in deleting the job!😠");
+    //     }
+    // };
+
+
     const handleDelete = async () => {
+        const loadingToast = toast.loading("Processing delete request...");
+        setLoading(true);
+
         try {
-            await axiosInstance.delete(`/news/${jobToDelete._id}`);
+            await axiosInstance.delete(`/cards/${jobToDelete._id}`);
             fetchNews(page, rowsPerPage);
             setDeleteDialogOpen(false);
             setJobToDelete(null);
-            toast.success("Deleted Sucessfully🥲!");
+            toast.success("Deleted Successfully🥲!"); // Show success toast after deletion
         } catch (error) {
             console.error("Error deleting the job:", error);
-            toast.error("Something went Wrong in deleting the job!😠");
+            toast.error("Something went wrong in deleting the job!😠"); // Show error toast if something goes wrong
+        } finally {
+            setLoading(false); // Set loading state to false after the request completes
+            toast.dismiss(loadingToast); // Dismiss the loading toast once the operation is done
         }
     };
+
+    const handleCategoryDelete = async () => {
+
+    }
+
 
     const handleMarqueeSwitch = (job) => {
         const activeMarqueeCount = jobs.filter((j) => j.isMarquee).length;
@@ -293,42 +400,8 @@ export default function Clients() {
         "others",
     ];
 
-    //Editor config
-    const modules = {
-        toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ["bold", "italic", "underline"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ indent: "-1" }, { indent: "+1" }],
-            [{ align: [] }],
-            ["link", "image"],
-            [{ color: [] }, { background: [] }],
-            ["clean"],
-            ["table"], // Add table support
-        ],
-    };
-
-    const formats = [
-        "header",
-        "font",
-        "size",
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "list",
-        "bullet",
-        "indent",
-        "align",
-        "link",
-        "image",
-        "color",
-        "background",
-        "table", // Add table and color formats
-    ];
 
 
-    console.log(jobs)
 
     return (
         <div>
@@ -338,18 +411,9 @@ export default function Clients() {
                 }}
                 onClick={() => handleClickOpen("add")}
             >
-                <Button variant="contained"> Add New News</Button>
+                <Button variant="contained"> Add New Client</Button>
             </h3>
 
-            {alertOpen && (
-                <Alert
-                    severity="warning"
-                    onClose={() => setAlertOpen(false)}
-                    style={{ marginBottom: "10px" }}
-                >
-                    You can't add more than 5 Marquee Active jobs!
-                </Alert>
-            )}
 
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -359,6 +423,9 @@ export default function Clients() {
                             <StyledTableCell>name</StyledTableCell>
                             <StyledTableCell align="right">Category</StyledTableCell>
                             <StyledTableCell align="right">Date</StyledTableCell>
+                            <StyledTableCell align="right">Img</StyledTableCell>
+                            <StyledTableCell align="right">Download</StyledTableCell>
+                            <StyledTableCell align="right">View</StyledTableCell>
                             <StyledTableCell align="right">Actions</StyledTableCell>
 
                         </TableRow>
@@ -383,6 +450,16 @@ export default function Clients() {
                                             </span>
                                         ))
                                         : "-"}
+                                    <EditOutlined
+                                        style={{
+                                            cursor: "pointer",
+                                            fontSize: "15px",
+                                            color: "blue",
+                                            marginLeft: "5px",
+                                        }}
+                                        onClick={() => handleClickOpen("editOrder", job)}
+                                    />
+
                                 </StyledTableCell>
 
                                 <StyledTableCell align="right">
@@ -393,6 +470,25 @@ export default function Clients() {
                                         day: "2-digit",
 
                                     })}
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    <img
+                                        src={job.imageUrl}
+                                        alt="Job Image"
+                                        style={{ maxWidth: '100px', height: 'auto' }} // Adjust width and height as needed
+                                    />
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    <Switch
+                                        checked={job.isActive}
+                                    // onChange={() => handleStatusSwitch(job)}
+                                    />
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    <Switch
+                                        checked={job.isActive}
+                                    // onChange={() => handleStatusSwitch(job)}
+                                    />
                                 </StyledTableCell>
 
                                 <StyledTableCell align="right">
@@ -442,20 +538,22 @@ export default function Clients() {
                 open={open}
                 onClose={() => handleClose("outsideClick")} // Instead of directly closing
                 disableBackdropClick
-                maxWidth="md"
+                maxWidth="md "
+                style={{ minWidth: "900px" }}
+
             >
 
                 <DialogTitle>
                     {dialogMode === "add"
-                        ? "Add Job"
+                        ? "Add Client"
                         : dialogMode === "edit"
-                            ? "Edit Job"
+                            ? "Edit Client"
                             : dialogMode === "editOrder"
                                 ? "Edit Order"
                                 : "Job Details"}
                 </DialogTitle>
 
-                <DialogContent>
+                <DialogContent style={{ minWidth: "500px" }}>
                     {dialogMode === "view" ? (
                         <>
                             <p>
@@ -493,46 +591,118 @@ export default function Clients() {
                                     News Image
                                 </strong>{" "}
                                 <img
-                                    src={dialogData.image}
-                                    alt={dialogData.title}
-                                    height={300}
-                                    width={500}
+                                    src={dialogData.imageUrl}
+                                    alt="Job Image"
+                                    style={{ maxWidth: '500px', height: 'auto' }} // Adjust width and height as needed
                                 />
                             </p>
 
                             <hr />
                         </>
                     ) : dialogMode === "editOrder" ? (
-                        {/* <>
+                        <>
                             <label
-                                htmlFor="orderNumber"
+                                htmlFor="Category Name"
                                 style={{
                                     fontSize: "15px",
                                     color: "#008080",
                                     fontWeight: "bolder",
                                 }}
                             >
-                                Order Number
+                                Category Name
                             </label>
                             <TextField
                                 margin="dense"
-                                label="Order Number"
+                                label="Category Name"
                                 fullWidth
                                 variant="outlined"
-                                type="number"
-                                value={formValues.orderNumber}
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, orderNumber: e.target.value })
-                                }
+                                type="text"
+                                // value={formValues.orderNumber}
+                                // onChange={(e) =>
+                                //     setFormValues({ ...formValues, orderNumber: e.target.value })
+                                // }
+                                value={categoryName}
+                                onChange={(e) => setCategoryName(e.target.value)}
                                 required
                             />
-                        </> */}
+                            <br />
+                            <br />
+
+                            <label
+                                id="choose-client"
+                                style={{
+                                    fontSize: "15px",
+                                    color: "#008080",
+                                    fontWeight: "bolder",
+                                }}
+                            >
+                                Select Client
+                            </label>
+                            <br />
+                            {/* <Select
+                                labelId="choose-client"
+                                fullWidth
+                                value={formValues.category}
+                                onChange={(e) =>
+                                    setFormValues({ ...formValues, category: e.target.value })
+                                }
+                                label="Client"
+                                variant="outlined"
+                            >
+                                {category.map((cat, index) => (
+                                    <MenuItem key={index} value={cat}>
+                                        {cat}
+                                    </MenuItem>
+                                ))}
+                            </Select> */}
+                            <Select
+                                labelId="choose-client"
+                                fullWidth
+                                value={selectedClientId}
+                                onChange={(e) => setSelectedClientId(e.target.value)}
+
+                                label="Client"
+                                variant="outlined"
+                            >
+                                {jobs.map((item, index) => (
+                                    <MenuItem key={item._id} value={item._id}>
+                                        {item.name || "unnkown"}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+
+
+                            <br />
+                            <br />
+                            <label
+                                htmlFor="Derive Link"
+                                style={{
+                                    fontSize: "15px",
+                                    color: "#008080",
+                                    fontWeight: "bolder",
+                                }}
+                            >
+                                Derive Link
+                            </label>
+                            <TextField
+                                margin="dense"
+                                label="Derive Link"
+                                fullWidth
+                                variant="outlined"
+                                type="text"
+                                value={deriveLink}
+                                onChange={(e) => setDeriveLink(e.target.value)}
+                                required
+                            />
+                            <br />
+
+                        </>
 
                     ) : (
                         <>
                             {/* 👇👇 #################################👆👆 */}
                             <label
-                                for=" Title"
+                                for=" Name"
                                 style={{
                                     fontSize: "15px",
                                     color: "#008080",
@@ -546,168 +716,57 @@ export default function Clients() {
                                 label="source"
                                 fullWidth
                                 variant="outlined"
-                                value={formValues.title}
+                                value={formValues.name}
                                 onChange={(e) =>
-                                    setFormValues({ ...formValues, title: e.target.value })
+                                    setFormValues({ ...formValues, name: e.target.value })
                                 }
                                 required
                             />
                             {/* 👇👇 #################################👆👆 */}
                             <br />
-                            {/* 👇👇 #################################👆👆 */}
 
+                            <br />
                             <label
-                                id="category-label"
+                                for=" Upload Image"
                                 style={{
                                     fontSize: "15px",
                                     color: "#008080",
                                     fontWeight: "bolder",
                                 }}
                             >
-                                Category
+                                Upload Image
                             </label>
                             <br />
-                            <Select
-                                labelId="category-label"
-                                fullWidth
-                                value={formValues.category}
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, category: e.target.value })
-                                }
-                                label="Category"
-                                variant="outlined"
-                            >
-                                {category.map((cat, index) => (
-                                    <MenuItem key={index} value={cat}>
-                                        {cat}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-
-                            {/* 👇👇 #################################👆👆 */}
-                            <br />
-                            <label
-                                for="Job Title"
-                                style={{
-                                    fontSize: "15px",
-                                    color: "#008080",
-                                    fontWeight: "bolder",
-                                }}
-                            >
-                                Source
-                            </label>
-                            <TextField
-                                margin="dense"
-                                label="Job Title"
-                                fullWidth
-                                variant="outlined"
-                                value={formValues.source}
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, source: e.target.value })
-                                }
-                                required
-                            />
-                            {/* 👇👇 #################################👆👆 */}
-                            {/* 👇👇 #################################👆👆 */}
-                            <label
-                                for="url"
-                                style={{
-                                    fontSize: "15px",
-                                    color: "#008080",
-                                    fontWeight: "bolder",
-                                }}
-                            >
-                                URL
-                            </label>
-                            <TextField
-                                margin="dense"
-                                label="URL"
-                                fullWidth
-                                variant="outlined"
-                                value={formValues.url}
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, url: e.target.value })
-                                }
-                                required
-                            />
-                            {/* 👇👇 #################################👆👆 */}
-                            <label
-                                for="Description"
-                                style={{
-                                    fontSize: "15px",
-                                    color: "#008080",
-                                    fontWeight: "bolder",
-                                }}
-                            >
-                                Description
-                            </label>
-                            <ReactQuill
-                                theme="snow"
-                                value={formValues.description}
-                                onChange={(description) =>
-                                    setFormValues({
-                                        ...formValues,
-                                        description,
-                                    })
-                                }
-                                modules={modules}
-                                formats={formats}
-                                style={{ height: "auto" }}
-                            />
-                            <br />
-                            {/* 👇👇 #################################👆👆 */}
-                            <div style={{ position: "relative", marginBottom: "20px" }}>
-                                <label
-                                    htmlFor="appDescription"
-                                    style={{
-                                        fontSize: "15px",
-                                        color: "#008080",
-                                        fontWeight: "bolder",
-                                    }}
-                                >
-                                    App Description
-                                </label>
-                                <textarea
-                                    id="appDescription"
-                                    name="appDescription"
-                                    rows="4"
-                                    maxLength={maxChars}
-                                    style={{
-                                        width: "100%",
-                                        padding: "10px",
-                                        borderRadius: "4px",
-                                        border: isMaxLimitReached
-                                            ? "2px solid red"
-                                            : "1px solid #c4c4c4",
-                                        fontSize: "16px",
-                                        outlineColor: "#008080",
-                                        resize: "none",
-                                    }}
-                                    value={formValues.appDescription}
-                                    onChange={handleDescriptionChange}
-                                    required
-                                />
-                                <div
-                                    style={{
-                                        position: "absolute",
-                                        bottom: "8px",
-                                        right: "10px",
-                                        fontSize: "12px",
-                                        color: isMaxLimitReached ? "red" : "#008080",
-                                    }}
-                                >
-                                    {charCount}/{maxChars}
-                                </div>
-                            </div>
-                            {/* 👇👇 #################################👆👆 */}
-                            <br />
-                            <br />
-                            <input
+                            {/* <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
                                     setFormValues({ ...formValues, image: e.target.files[0] })
                                 } // Get file object
+                                required
+                            /> */}
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                required
+                                variant="outlined"
+                            />
+
+
+                            <br />
+                            <br />
+                            <TextField
+                                margin="dense"
+                                label="source"
+                                type="date"
+                                fullWidth
+                                variant="outlined"
+                                value={formValues.date}
+                                onChange={(e) =>
+                                    setFormValues({ ...formValues, date: e.target.value })
+                                }
                                 required
                             />
 
@@ -719,11 +778,26 @@ export default function Clients() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
+                    {/* <Button onClick={handleCategoryDelete}>Delete</Button> */}
+
                     {dialogMode !== "view" && (
                         <Button onClick={handleSubmit} color="primary" variant="contained">
                             {dialogMode === "add" ? "Add" : "Update"}
+
                         </Button>
                     )}
+                    {dialogMode == "editOrder" && (
+                        <DeleteOutlined
+                            style={{
+                                cursor: "pointer",
+                                fontSize: "20px",
+                                color: "red",
+                                padding: "10px"
+                            }}
+                            onClick={() => handleCategoryDelete()}
+                        />
+                    )}
+
                 </DialogActions>
             </Dialog>
 
@@ -761,7 +835,15 @@ export default function Clients() {
                     <Button onClick={handleDelete} color="primary">
                         Delete
                     </Button>
+                    {/* {loading && (
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                            <CircularProgress />
+                        </div>
+                    )} */}
+
                 </DialogActions>
+
+
             </Dialog>
         </div>
     );
