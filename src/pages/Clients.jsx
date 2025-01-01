@@ -66,10 +66,7 @@ export default function Clients() {
     const [dialogData, setDialogData] = useState({});
     const [formValues, setFormValues] = useState({
         name: "",
-
-
         imageUrl: null,
-
         category: "",
         date: ""
 
@@ -235,7 +232,7 @@ export default function Clients() {
                 const cardData = {
                     name: formValues.name,
                     date: formValues.date,
-                    image: formValues.image, // Assuming the image will be converted to base64
+                    image: formValues.image,
                 };
 
                 await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
