@@ -38,35 +38,73 @@ const HomePageCarousel = () => {
     }, []);
 
     // Handle upload or update image
+    // const handleSave = async () => {
+    //     if (!imageName || (!imageFile && !selectedImage)) {
+    //         toast.error('Please provide image name and file');
+    //         return;
+    //     }
+
+    //     const formData = new FormData();
+    //     formData.append('imageName', imageName);
+    //     formData.append('imageType', imageType); // Add imageType to formData
+    //     if (imageFile) formData.append('image', imageFile);
+
+    //     try {
+    //         setLoading(true);
+    //         if (selectedImage) {
+    //             await axiosInstance.put(`/carousel/update/${selectedImage.id}`, formData);
+    //             toast.success('Image updated successfully');
+    //         } else {
+    //             await axiosInstance.post('/carousel/upload', formData);
+    //             toast.success('Image uploaded successfully');
+    //         }
+    //         fetchImages();
+    //         setOpen(false);
+    //         setImagePreview('');
+    //     } catch (error) {
+    //         toast.error('Error saving image');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
     const handleSave = async () => {
         if (!imageName || (!imageFile && !selectedImage)) {
             toast.error('Please provide image name and file');
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('imageName', imageName);
         formData.append('imageType', imageType); // Add imageType to formData
         if (imageFile) formData.append('image', imageFile);
-
+    
+        let toastId; // To track the loading toast
         try {
             setLoading(true);
+            toastId = toast.loading('Uploading image, please wait...'); // Show loading toast
+    
             if (selectedImage) {
                 await axiosInstance.put(`/carousel/update/${selectedImage.id}`, formData);
-                toast.success('Image updated successfully');
+                toast.success('Image updated successfully', { id: toastId }); // Replace loading toast with success
             } else {
                 await axiosInstance.post('/carousel/upload', formData);
-                toast.success('Image uploaded successfully');
+                toast.success('Image uploaded successfully', { id: toastId }); // Replace loading toast with success
             }
+    
             fetchImages();
             setOpen(false);
             setImagePreview('');
         } catch (error) {
-            toast.error('Error saving image');
+            toast.error('Error saving image', { id: toastId }); // Replace loading toast with error
         } finally {
             setLoading(false);
         }
     };
+    
+
+
+
 
     // Handle delete image
     const handleDeleteConfirm = async () => {
