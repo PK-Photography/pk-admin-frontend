@@ -73,13 +73,13 @@ const components = {
     //   icon: icons.KeyOutlined,
     // },
 
-    // {
-    //   id: "manage-leaves",
-    //   title: "Manage Leaves",
-    //   type: "item",
-    //   url: "/manage-leaves",
-    //   icon: icons.BarcodeOutlined,
-    // },
+    {
+      id: "manage-gallary",
+      title: "Manage Gallary",
+      type: "item",
+      url: "/manage-gallary",
+      icon: icons.BarcodeOutlined,
+    },
 
 
     // {

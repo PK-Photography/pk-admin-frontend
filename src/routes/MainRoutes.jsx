@@ -10,6 +10,7 @@ import Clients from "pages/Clients";
 import AdminManage from "pages/AdminManage";
 import HomePageCarousel from "pages/HomePageCarousel";
 import Reviews from "pages/Reviews";
+import Gallary from "pages/Gallary";
 // import AdminManage from "pages/AdminManage";
 // import MasterProtecterRoute from "./MasterProtecterRoute";
 // import EmployeeManagement from "pages/EmployeeManagement";
@@ -66,6 +67,10 @@ const MainRoutes = {
         {
           path: "/home-page-carousel",
           element: <HomePageCarousel />, // Dashboard page
+        },
+        {
+          path: "/manage-gallary",
+          element: <Gallary />, // Dashboard page
         },
         {
           path: "/reviews",
