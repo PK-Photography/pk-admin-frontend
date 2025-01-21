@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, CircularProgress, Box, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
+import { Button, CircularProgress, Box, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, MenuItem, Select, InputLabel, FormControl, Checkbox, ListItemText } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import toast from 'react-hot-toast';
 import axiosInstance from 'utils/axiosInstance';
+
+const categoriesList = [
+    'All',
+    'Portfolio',
+    'Portrait',
+    'Headshots',
+    'Editorial',
+    'Celebrity',
+    'Ads',
+    'Wedding',
+    'Boudoir',
+    'E-Commerce',
+    'Food',
+    'RealEstate',
+    'Design',
+];
 
 const Gallary = () => {
     const [images, setImages] = useState([]);
@@ -18,8 +34,9 @@ const Gallary = () => {
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
     const [deleteImageId, setDeleteImageId] = useState(null);
+    const [categories, setCategories] = useState(['All']);  // State to hold selected categories
 
-    // Fetch all carousel images
+    // Fetch all gallery images
     const fetchImages = async () => {
         setLoading(true);
         try {
@@ -36,41 +53,50 @@ const Gallary = () => {
         fetchImages();
     }, []);
 
-    // Handle upload or update image
+    // Handle save image (upload or update)
     const handleSave = async () => {
-        if (!imageName || !subtitle || (!imageFile && !selectedImage)) {
+        if (!imageName || !subtitle || categories.length === 0 || (!imageFile && !selectedImage)) {
             toast.error('Please provide all required fields');
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('imageName', imageName);
         formData.append('subtitle', subtitle);
+        
+        // Directly append categories as an array
+        categories.forEach((category) => formData.append('categories[]', category)); // Use 'categories[]' to handle multiple values
+        
         if (imageFile) formData.append('image', imageFile);
-
+    
         let toastId;
         try {
             setLoading(true);
             toastId = toast.loading('Uploading image, please wait...');
-
+    
+            // If selectedImage exists, it's an update, else a new upload
             if (selectedImage) {
+                // Log the formData to see if all data is correct
+                console.log('Updating image with formData:', formData);
                 await axiosInstance.put(`/gallery/update/${selectedImage.id}`, formData);
                 toast.success('Image updated successfully', { id: toastId });
             } else {
                 await axiosInstance.post('/gallery/upload', formData);
                 toast.success('Image uploaded successfully', { id: toastId });
             }
-
+    
             fetchImages();
             setOpen(false);
             setImagePreview('');
+            setCategories([]);  // Clear categories after save
         } catch (error) {
+            console.error('Error saving image:', error);
             toast.error('Error saving image', { id: toastId });
         } finally {
             setLoading(false);
         }
     };
-
+    
     // Handle delete image
     const handleDeleteConfirm = async () => {
         try {
@@ -89,6 +115,7 @@ const Gallary = () => {
     const columns = [
         { field: 'imageName', headerName: 'Image Name', width: 300 },
         { field: 'subtitle', headerName: 'Subtitle', width: 300 },
+        { field: 'categories', headerName: 'Categories', width: 300 },
         {
             field: 'imageUrl',
             headerName: 'Image',
@@ -116,6 +143,7 @@ const Gallary = () => {
                             setImageName(params.row.imageName);
                             setSubtitle(params.row.subtitle);
                             setImagePreview(params.row.imageUrl);
+                            setCategories(params.row.categories || []);  // Set selected categories
                             setOpen(true);
                         }}
                     >
@@ -177,6 +205,22 @@ const Gallary = () => {
                         value={subtitle}
                         onChange={(e) => setSubtitle(e.target.value)}
                     />
+                    <FormControl fullWidth style={{ marginTop: 16 }}>
+                        <InputLabel>Categories</InputLabel>
+                        <Select
+                            multiple
+                            value={categories}
+                            onChange={(e) => setCategories(e.target.value)}
+                            renderValue={(selected) => selected.join(', ')}
+                        >
+                            {categoriesList.map((category) => (
+                                <MenuItem key={category} value={category}>
+                                    <Checkbox checked={categories.indexOf(category) > -1} />
+                                    <ListItemText primary={category} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <input
                         type="file"
                         accept="image/*"
