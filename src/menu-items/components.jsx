@@ -11,6 +11,7 @@ import {
   GlobalOutlined,
   FileDoneOutlined,
   NotificationOutlined,
+  UsergroupAddOutlined
 } from "@ant-design/icons";
 
 // icons
@@ -26,6 +27,7 @@ const icons = {
   GlobalOutlined,
   FileDoneOutlined,
   NotificationOutlined,
+  UsergroupAddOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -44,13 +46,20 @@ const components = {
       icon: icons.DollarOutlined,
     },
     {
+      id: "user-management",
+      title: "User Management",
+      type: "item",
+      url: "/user-management",
+      icon: icons.UsergroupAddOutlined,
+    },
+    {
       id: "manage-bookings",
       title: "Manage Bookings",
       type: "item",
       url: "/manage-bookings",
       icon: icons.RocketOutlined,
     },
-    
+
     {
       id: "home-page-carousel",
       title: "Home Page Carousel",

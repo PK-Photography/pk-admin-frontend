@@ -11,6 +11,7 @@ import AdminManage from "pages/AdminManage";
 import HomePageCarousel from "pages/HomePageCarousel";
 import Reviews from "pages/Reviews";
 import Gallary from "pages/Gallary";
+import UserManagement from "pages/UserManagement";
 // import AdminManage from "pages/AdminManage";
 // import MasterProtecterRoute from "./MasterProtecterRoute";
 // import EmployeeManagement from "pages/EmployeeManagement";
@@ -50,37 +51,41 @@ const MainRoutes = {
           path: "dashboard/:id",
           element: <DashboardDefault />, // Dashboard page
         },
-    
+
         {
           path: "manage-bookings",
           element: <Bookings />, // Dashboard page
         },
         {
           path: "clients",
-          element: <Clients />, // Dashboard page
+          element: <Clients />,
         },
-    
+        {
+          path: "user-management",
+          element: <UserManagement />,
+        },
+
         {
           path: "admin-management",
-          element: <AdminManage />, // Dashboard page
+          element: <AdminManage />,
         },
         {
           path: "/home-page-carousel",
-          element: <HomePageCarousel />, // Dashboard page
+          element: <HomePageCarousel />,
         },
         {
           path: "/manage-gallary",
-          element: <Gallary />, // Dashboard page
+          element: <Gallary />,
         },
         {
           path: "/reviews",
-          element: <Reviews />, // Dashboard page
+          element: <Reviews />,
         },
-    
-      
-    
-       
-    
+
+
+
+
+
         // Admin management section wrapped by MasterProtecterRoute
         // {
         //   element: <MasterProtecterRoute />, // Wrapping this section with MasterProtecterRoute
@@ -122,9 +127,9 @@ const MainRoutes = {
         //       path: "apply-leave",
         //       element: <ApplyLeaves />, // Dashboard page
         //     },
-        
-           
-          
+
+
+
         //   ],
         // },
       ],
