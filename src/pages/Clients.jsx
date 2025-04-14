@@ -12,9 +12,6 @@ import { useState, useEffect } from 'react';
 import Switch from '@mui/material/Switch';
 import TablePagination from '@mui/material/TablePagination';
 import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 
@@ -70,7 +67,8 @@ export default function Clients() {
     category: '',
     date: '',
     canDownload: true,
-    canView: true
+    canView: true,
+    pin: ''
   });
   const [alertOpen, setAlertOpen] = useState(false); // Alert for isMarquee
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
@@ -91,11 +89,7 @@ export default function Clients() {
       .get(`/cards`)
       .then((response) => {
         const newsData = response.data;
-        // const pagination = response.data.data.pagination;
         setJobs(newsData);
-        // setTotalItems(pagination.totalItems);
-        // setTotalPages(pagination.totalPages);
-        // console.log(newsData)
       })
       .catch((error) => {
         console.error('Error fetching the jobs:', error);
@@ -133,7 +127,8 @@ export default function Clients() {
         imageUrl: job.image || null,
         category: job.category || '',
         canDownload: job.canDownload || true,
-        canView: job.canView || true
+        canView: job.canView || true,
+        pin: job.pin || ''
       });
 
       toast.dismiss(loadingToastId);
@@ -162,55 +157,6 @@ export default function Clients() {
     setConfirmCloseOpen(false); // Close the confirmation dialog
   };
 
-  // const handleSubmit = async () => {
-  //     try {
-
-  //         if (dialogMode === "add") {
-  //             const cardData = {
-  //                 name: formValues.name,
-  //                 date: formValues.date,
-  //                 image: formValues.image, // Assuming the image will be converted to base64
-  //             };
-
-  //             try {
-  //                 await axiosInstance.post("/upload", cardData);
-  //                 toast.success("News Posted Successfully!🎉");
-  //             } catch (error) {
-  //                 console.error(error);
-  //                 toast.error("Failed to post news. Please try again.");
-  //             }
-  //         }
-
-  //         else if (dialogMode === "edit") {
-  //             const cardData = {
-  //                 name: formValues.name,
-  //                 date: formValues.date,
-  //                 image: formValues.image, // Assuming the image will be converted to base64
-  //             };
-
-  //             await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
-  //                 headers: { "Content-Type": "multipart/form-data" },
-  //             });
-  //             toast.success("News Edited Successfully!🖊️😍");
-  //         } else if (dialogMode === "editOrder") {
-  //             const updatedOrder = {
-  //                 orderNumber: formValues.orderNumber,
-  //             };
-
-  //             await axiosInstance.put(`/news/order/${dialogData._id}`, updatedOrder, {
-  //                 headers: { "Content-Type": "application/json" },
-  //             });
-  //             toast.success("Order updated Successfully!🖊️😍");
-  //         }
-
-  //         fetchNews(page, rowsPerPage); // Refresh the data
-  //         handleClose();
-  //     } catch (error) {
-  //         console.error("Error submitting the form:", error);
-  //         toast.error(`Error: ${error.response?.data?.message || "Unknown error"}`);
-  //     }
-  // };
-
   const handleSubmit = async () => {
     const loadingToast = toast.loading('Processing your request...'); // Show a loading toast
     try {
@@ -218,7 +164,8 @@ export default function Clients() {
         const cardData = {
           name: formValues.name,
           date: formValues.date,
-          image: formValues.image // Assuming the image will be converted to base64
+          image: formValues.image,
+          pin: formValues.pin
         };
 
         try {
@@ -232,7 +179,8 @@ export default function Clients() {
         const cardData = {
           name: formValues.name,
           date: formValues.date,
-          image: formValues.image
+          image: formValues.image,
+          pin: formValues.pin
         };
 
         await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
@@ -292,19 +240,6 @@ export default function Clients() {
     setJobToDelete(job);
     setDeleteDialogOpen(true);
   };
-
-  // const handleDelete = async () => {
-  //     try {
-  //         await axiosInstance.delete(`/cards/${jobToDelete._id}`);
-  //         fetchNews(page, rowsPerPage);
-  //         setDeleteDialogOpen(false);
-  //         setJobToDelete(null);
-  //         toast.success("Deleted Sucessfully🥲!");
-  //     } catch (error) {
-  //         console.error("Error deleting the job:", error);
-  //         toast.error("Something went Wrong in deleting the job!😠");
-  //     }
-  // };
 
   const handleDelete = async () => {
     const loadingToast = toast.loading('Processing delete request...');
@@ -375,6 +310,7 @@ export default function Clients() {
             <TableRow>
               <StyledTableCell>Sr. No.</StyledTableCell>
               <StyledTableCell>name</StyledTableCell>
+              <StyledTableCell>PIN</StyledTableCell>
               <StyledTableCell align="right">Category</StyledTableCell>
               <StyledTableCell align="right">Date</StyledTableCell>
               <StyledTableCell align="right">Img</StyledTableCell>
@@ -392,6 +328,9 @@ export default function Clients() {
                 <StyledTableCell component="th" scope="row">
                   {job.name.substring(0, 80)}
                   {job.name.length > 80 && '...'}
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row">
+                  {job.pin}
                 </StyledTableCell>
 
                 <StyledTableCell align="right">
@@ -557,10 +496,6 @@ export default function Clients() {
                 fullWidth
                 variant="outlined"
                 type="text"
-                // value={formValues.orderNumber}
-                // onChange={(e) =>
-                //     setFormValues({ ...formValues, orderNumber: e.target.value })
-                // }
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 required
@@ -579,22 +514,6 @@ export default function Clients() {
                 Select Client
               </label>
               <br />
-              {/* <Select
-                                labelId="choose-client"
-                                fullWidth
-                                value={formValues.category}
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, category: e.target.value })
-                                }
-                                label="Client"
-                                variant="outlined"
-                            >
-                                {category.map((cat, index) => (
-                                    <MenuItem key={index} value={cat}>
-                                        {cat}
-                                    </MenuItem>
-                                ))}
-                            </Select> */}
               <Select
                 labelId="choose-client"
                 fullWidth
@@ -613,14 +532,14 @@ export default function Clients() {
               <br />
               <br />
               <label
-                htmlFor="Derive Link"
+                htmlFor="Drive Link"
                 style={{
                   fontSize: '15px',
                   color: '#008080',
                   fontWeight: 'bolder'
                 }}
               >
-                Derive Link
+                Drive Link
               </label>
               <TextField
                 margin="dense"
@@ -636,7 +555,6 @@ export default function Clients() {
             </>
           ) : (
             <>
-              {/* 👇👇 #################################👆👆 */}
               <label
                 for=" Name"
                 style={{
@@ -656,9 +574,36 @@ export default function Clients() {
                 onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
                 required
               />
-              {/* 👇👇 #################################👆👆 */}
               <br />
+              <br />
+              <label
+                for="pin"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder'
+                }}
+              >
+                PIN
+              </label>
 
+              <TextField
+                margin="dense"
+                label="4-digit PIN (OTP)"
+                type="number"
+                fullWidth
+                variant="outlined"
+                inputProps={{ maxLength: 4 }}
+                value={formValues.pin}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length <= 4) {
+                    setFormValues((prev) => ({ ...prev, pin: val }));
+                  }
+                }}
+              />
+
+              <br />
               <br />
               <label
                 for=" Upload Image"
@@ -671,14 +616,6 @@ export default function Clients() {
                 Upload Image
               </label>
               <br />
-              {/* <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) =>
-                                    setFormValues({ ...formValues, image: e.target.files[0] })
-                                } // Get file object
-                                required
-                            /> */}
 
               <input type="file" accept="image/*" onChange={handleImageChange} required variant="outlined" />
 
@@ -701,7 +638,6 @@ export default function Clients() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          {/* <Button onClick={handleCategoryDelete}>Delete</Button> */}
 
           {dialogMode !== 'view' && (
             <Button onClick={handleSubmit} color="primary" variant="contained">
@@ -730,7 +666,6 @@ export default function Clients() {
           <Button onClick={() => handleConfirmClose(false)}>No</Button>
         </DialogActions>
       </Dialog>
-      {/* ===================== || edit order number dialog ||=================== */}
 
       <Dialog open={confirmCloseOpen}>
         <DialogTitle>Are you sure you want to close?</DialogTitle>
@@ -751,11 +686,6 @@ export default function Clients() {
           <Button onClick={handleDelete} color="primary">
             Delete
           </Button>
-          {/* {loading && (
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-                            <CircularProgress />
-                        </div>
-                    )} */}
         </DialogActions>
       </Dialog>
     </div>
