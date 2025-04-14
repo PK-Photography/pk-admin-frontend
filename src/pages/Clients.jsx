@@ -68,7 +68,8 @@ export default function Clients() {
     date: '',
     canDownload: true,
     canView: true,
-    pin: ''
+    pin: '',
+    url: ''
   });
   const [alertOpen, setAlertOpen] = useState(false); // Alert for isMarquee
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
@@ -128,7 +129,8 @@ export default function Clients() {
         category: job.category || '',
         canDownload: job.canDownload || true,
         canView: job.canView || true,
-        pin: job.pin || ''
+        pin: job.pin || '',
+        url: job.url || ''
       });
 
       toast.dismiss(loadingToastId);
@@ -165,7 +167,8 @@ export default function Clients() {
           name: formValues.name,
           date: formValues.date,
           image: formValues.image,
-          pin: formValues.pin
+          pin: formValues.pin,
+          url: formValues.url,
         };
 
         try {
@@ -180,7 +183,8 @@ export default function Clients() {
           name: formValues.name,
           date: formValues.date,
           image: formValues.image,
-          pin: formValues.pin
+          pin: formValues.pin,
+          url: formValues.url
         };
 
         await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
@@ -311,6 +315,7 @@ export default function Clients() {
               <StyledTableCell>Sr. No.</StyledTableCell>
               <StyledTableCell>name</StyledTableCell>
               <StyledTableCell>PIN</StyledTableCell>
+              <StyledTableCell>URL</StyledTableCell>
               <StyledTableCell align="right">Category</StyledTableCell>
               <StyledTableCell align="right">Date</StyledTableCell>
               <StyledTableCell align="right">Img</StyledTableCell>
@@ -331,6 +336,9 @@ export default function Clients() {
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
                   {job.pin}
+                </StyledTableCell>
+                <StyledTableCell component="th" scope="row">
+                  {job.url}
                 </StyledTableCell>
 
                 <StyledTableCell align="right">
@@ -543,7 +551,7 @@ export default function Clients() {
               </label>
               <TextField
                 margin="dense"
-                label="Derive Link"
+                label="Drive Link"
                 fullWidth
                 variant="outlined"
                 type="text"
@@ -601,6 +609,29 @@ export default function Clients() {
                     setFormValues((prev) => ({ ...prev, pin: val }));
                   }
                 }}
+              />
+
+              <br />
+              <br />
+              <label
+                for="url"
+                style={{
+                  fontSize: '15px',
+                  color: '#008080',
+                  fontWeight: 'bolder'
+                }}
+              >
+                URL
+              </label>
+
+              <TextField
+                margin="dense"
+                label="URL"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={formValues.url}
+                onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
               />
 
               <br />
