@@ -175,8 +175,21 @@ export default function Clients() {
           await axiosInstance.post('/upload', cardData);
           toast.success('News Posted Successfully!🎉');
         } catch (error) {
-          console.error(error);
-          toast.error('Failed to post news. Please try again.');
+          const msg =
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            "Unknown error";
+        
+          toast.error(`Error: ${msg}`);
+        
+          if (msg.toLowerCase().includes("already exists")) {
+            setFormValues((prev) => ({
+              ...prev,
+              name: "",
+            }));
+          }
+        
+          console.error("Error submitting the form:", error);
         }
       } else if (dialogMode === 'edit') {
         const cardData = {
@@ -671,7 +684,12 @@ export default function Clients() {
           <Button onClick={handleClose}>Cancel</Button>
 
           {dialogMode !== 'view' && (
-            <Button onClick={handleSubmit} color="primary" variant="contained">
+            <Button
+              onClick={handleSubmit}
+              color="primary"
+              variant="contained"
+              disabled={!formValues.name.trim()} // prevent empty submit
+            >
               {dialogMode === 'add' ? 'Add' : 'Update'}
             </Button>
           )}
