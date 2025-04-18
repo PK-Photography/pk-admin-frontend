@@ -1,7 +1,4 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
 import ViewClientModal from '../components/ViewClientModal';
 import AddClientModal from '../components/AddClientModal';
 import EditClientModal from '../components/EditClientModal';
@@ -27,7 +24,6 @@ export default function Clients() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [open, setOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('add'); // 'add', 'edit', 'view'
   const [dialogData, setDialogData] = useState({});
