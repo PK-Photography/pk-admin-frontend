@@ -1,17 +1,13 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import axios from 'axios';
+import ViewClientModal from '../components/ViewClientModal';
+import AddClientModal from '../components/AddClientModal';
+import EditClientModal from '../components/EditClientModal';
+import ClientTable from '../components/ClientTable';
 import { useState, useEffect } from 'react';
-import Switch from '@mui/material/Switch';
-import TablePagination from '@mui/material/TablePagination';
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 
@@ -21,36 +17,10 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  TextField,
   Typography,
-  Alert,
-  Select,
-  MenuItem,
-  CircularProgress
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import axiosInstance from 'utils/axiosInstance';
-
-const label = { inputProps: { 'aria-label': 'Switch demo' } };
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#008080',
-    color: theme.palette.common.white
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
-  }
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
 
 export default function Clients() {
   const [jobs, setJobs] = useState([]);
@@ -71,12 +41,10 @@ export default function Clients() {
     pin: '',
     url: ''
   });
-  const [alertOpen, setAlertOpen] = useState(false); // Alert for isMarquee
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
   const [jobToDelete, setJobToDelete] = useState(null); // Job to delete
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [pendingCloseAction, setPendingCloseAction] = useState(null);
-  const [orderNo, setOrderNo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [categoryName, setCategoryName] = useState(''); // New category name
   const [deriveLink, setDeriveLink] = useState(''); // New category image link
@@ -145,11 +113,6 @@ export default function Clients() {
       setPendingCloseAction(action); // Store the action (outside click or cancel)
       setConfirmCloseOpen(true); // Open the confirmation dialog
     }
-  };
-
-  // For cancel button:
-  const handleClickCancel = () => {
-    handleClose('cancel');
   };
 
   const handleConfirmClose = (confirm) => {
@@ -234,25 +197,6 @@ export default function Clients() {
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert('File size exceeds 10MB. Please upload a smaller file.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormValues((prev) => ({
-        ...prev,
-        image: reader.result // Set Base64 string
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleDeleteDialogOpen = (job) => {
     setJobToDelete(job);
     setDeleteDialogOpen(true);
@@ -321,126 +265,18 @@ export default function Clients() {
         <Button variant="contained"> Add New Client</Button>
       </h3>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Sr. No.</StyledTableCell>
-              <StyledTableCell>name</StyledTableCell>
-              <StyledTableCell>PIN</StyledTableCell>
-              <StyledTableCell>URL</StyledTableCell>
-              <StyledTableCell align="right">Category</StyledTableCell>
-              <StyledTableCell align="right">Date</StyledTableCell>
-              <StyledTableCell align="right">Img</StyledTableCell>
-              <StyledTableCell align="right">Download</StyledTableCell>
-              <StyledTableCell align="right">View</StyledTableCell>
-              <StyledTableCell align="right">Actions</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {jobs?.map((job, index) => (
-              <StyledTableRow key={job.id}>
-                <StyledTableCell component="th" scope="row">
-                  {index + 1}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  {job.name.substring(0, 80)}
-                  {job.name.length > 80 && '...'}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  {job.pin}
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  {job.url}
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {job.category && job.category.length > 0
-                    ? job.category.map((cat, index) => (
-                        <span key={cat._id}>
-                          {cat.name}
-                          {index < job.category.length - 1 && ', '}
-                        </span>
-                      ))
-                    : '-'}
-                  <EditOutlined
-                    style={{
-                      cursor: 'pointer',
-                      fontSize: '15px',
-                      color: 'blue',
-                      marginLeft: '5px'
-                    }}
-                    onClick={() => handleClickOpen('editOrder', job)}
-                  />
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  {/* {job.date || "-"} */}
-                  {new Date(job.updatedAt).toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  })}
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  <img
-                    src={job.imageUrl}
-                    alt="Job Image"
-                    style={{ maxWidth: '100px', height: 'auto' }} // Adjust width and height as needed
-                  />
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  <Switch checked={job.canDownload} onChange={() => handleCanDownloadStatus(job)} />
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  <Switch
-                    checked={job.canView}
-                    onChange={() => handleCanViewStatus(job)}
-                  />
-                </StyledTableCell>
-
-                <StyledTableCell align="right">
-                  <EyeOutlined
-                    style={{
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                      color: 'green',
-                      marginRight: '8px'
-                    }}
-                    onClick={() => handleClickOpen('view', job)}
-                  />
-                  <EditOutlined
-                    style={{
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                      color: 'blue',
-                      marginRight: '8px'
-                    }}
-                    onClick={() => handleClickOpen('edit', job)}
-                  />
-                  <DeleteOutlined
-                    style={{
-                      cursor: 'pointer',
-                      fontSize: '20px',
-                      color: 'red'
-                    }}
-                    onClick={() => handleDeleteDialogOpen(job)}
-                  />
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={totalItems}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+      <ClientTable
+        jobs={jobs}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        totalItems={totalItems}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        handleCanDownloadStatus={handleCanDownloadStatus}
+        handleCanViewStatus={handleCanViewStatus}
+        handleClickOpen={handleClickOpen}
+        handleDeleteDialogOpen={handleDeleteDialogOpen}
+      />
 
       {/* Add/Edit/View Job Dialog */}
       <Dialog
@@ -462,222 +298,25 @@ export default function Clients() {
 
         <DialogContent style={{ minWidth: '500px' }}>
           {dialogMode === 'view' ? (
-            <>
-              <p>
-                <strong style={{ fontSize: '18px', color: '#008080' }}>Name</strong> <h3> {dialogData.name}</h3>
-              </p>
-              <p>
-                <strong style={{ fontSize: '18px', color: '#008080' }}>Category</strong>{' '}
-                {/* <h3> {dialogData.category || "No Caregory "} */}
-                <h3>
-                  {dialogData.category && dialogData.category.length > 0
-                    ? dialogData.category.map((cat, index) => (
-                        <span key={cat._id}>
-                          {cat.name}
-                          {index < dialogData.category.length - 1 && ', '}
-                        </span>
-                      ))
-                    : '-'}
-                </h3>
-              </p>
-
-              <hr />
-              <p
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '5px'
-                }}
-              >
-                <strong style={{ fontSize: '18px', color: '#008080' }}>News Image</strong>{' '}
-                <img
-                  src={dialogData.imageUrl}
-                  alt="Job Image"
-                  style={{ maxWidth: '500px', height: 'auto' }} // Adjust width and height as needed
-                />
-              </p>
-
-              <hr />
-            </>
+            <ViewClientModal dialogData={dialogData} />
           ) : dialogMode === 'editOrder' ? (
-            <>
-              <label
-                htmlFor="Category Name"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                Category Name
-              </label>
-              <TextField
-                margin="dense"
-                label="Category Name"
-                fullWidth
-                variant="outlined"
-                type="text"
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                required
-              />
-              <br />
-              <br />
-
-              <label
-                id="choose-client"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                Select Client
-              </label>
-              <br />
-              <Select
-                labelId="choose-client"
-                fullWidth
-                value={selectedClientId}
-                onChange={(e) => setSelectedClientId(e.target.value)}
-                label="Client"
-                variant="outlined"
-              >
-                {jobs.map((item, index) => (
-                  <MenuItem key={item._id} value={item._id}>
-                    {item.name || 'unnkown'}
-                  </MenuItem>
-                ))}
-              </Select>
-
-              <br />
-              <br />
-              <label
-                htmlFor="Drive Link"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                Drive Link
-              </label>
-              <TextField
-                margin="dense"
-                label="Drive Link"
-                fullWidth
-                variant="outlined"
-                type="text"
-                value={deriveLink}
-                onChange={(e) => setDeriveLink(e.target.value)}
-                required
-              />
-              <br />
-            </>
+            <EditClientModal
+              categoryName={categoryName}
+              setCategoryName={setCategoryName}
+              deriveLink={deriveLink}
+              setDeriveLink={setDeriveLink}
+              selectedClientId={selectedClientId}
+              setSelectedClientId={setSelectedClientId}
+              jobs={jobs}
+            />
           ) : (
-            <>
-              <label
-                for=" Name"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                Title
-              </label>
-              <TextField
-                margin="dense"
-                label="source"
-                fullWidth
-                variant="outlined"
-                value={formValues.name}
-                onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                required
-              />
-              <br />
-              <br />
-              <label
-                for="pin"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                PIN
-              </label>
-
-              <TextField
-                margin="dense"
-                label="4-digit PIN (OTP)"
-                type="number"
-                fullWidth
-                variant="outlined"
-                inputProps={{ maxLength: 4 }}
-                value={formValues.pin}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val.length <= 4) {
-                    setFormValues((prev) => ({ ...prev, pin: val }));
-                  }
-                }}
-              />
-
-              <br />
-              <br />
-              <label
-                for="url"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                URL
-              </label>
-
-              <TextField
-                margin="dense"
-                label="URL"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={formValues.url}
-                onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
-              />
-
-              <br />
-              <br />
-              <label
-                for=" Upload Image"
-                style={{
-                  fontSize: '15px',
-                  color: '#008080',
-                  fontWeight: 'bolder'
-                }}
-              >
-                Upload Image
-              </label>
-              <br />
-
-              <input type="file" accept="image/*" onChange={handleImageChange} required variant="outlined" />
-
-              <br />
-              <br />
-              <TextField
-                margin="dense"
-                label="source"
-                type="date"
-                fullWidth
-                variant="outlined"
-                value={formValues.date}
-                onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
-                required
-              />
-
-              <br />
-            </>
+            <AddClientModal
+              open={open}
+              onClose={handleClose}
+              onSubmit={handleSubmit}
+              formValues={formValues}
+              setFormValues={setFormValues}
+            />
           )}
         </DialogContent>
         <DialogActions>
