@@ -35,6 +35,7 @@ const Gallary = () => {
     const [imagePreview, setImagePreview] = useState('');
     const [deleteImageId, setDeleteImageId] = useState(null);
     const [categories, setCategories] = useState(['All']);  // State to hold selected categories
+    const [position, setPosition] = useState('');
 
     // Fetch all gallery images
     const fetchImages = async () => {
@@ -63,6 +64,7 @@ const Gallary = () => {
         const formData = new FormData();
         formData.append('imageName', imageName);
         formData.append('subtitle', subtitle);
+        formData.append('position', position || 0);
         
         // Directly append categories as an array
         categories.forEach((category) => formData.append('categories[]', category)); // Use 'categories[]' to handle multiple values
@@ -116,6 +118,7 @@ const Gallary = () => {
         { field: 'imageName', headerName: 'Image Name', width: 300 },
         { field: 'subtitle', headerName: 'Subtitle', width: 300 },
         { field: 'categories', headerName: 'Categories', width: 300 },
+        { field: 'position', headerName: 'Position', width: 120 },
         {
             field: 'imageUrl',
             headerName: 'Image',
@@ -144,6 +147,7 @@ const Gallary = () => {
                             setSubtitle(params.row.subtitle);
                             setImagePreview(params.row.imageUrl);
                             setCategories(params.row.categories || []);  // Set selected categories
+                            setPosition(params.row.position || '');
                             setOpen(true);
                         }}
                     >
@@ -204,6 +208,14 @@ const Gallary = () => {
                         fullWidth
                         value={subtitle}
                         onChange={(e) => setSubtitle(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Position"
+                        type="number"
+                        fullWidth
+                        value={position}
+                        onChange={(e) => setPosition(e.target.value)}
                     />
                     <FormControl fullWidth style={{ marginTop: 16 }}>
                         <InputLabel>Categories</InputLabel>
