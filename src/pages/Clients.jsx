@@ -42,7 +42,7 @@ export default function Clients() {
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [pendingCloseAction, setPendingCloseAction] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [categoryName, setCategoryName] = useState(''); // New category name
+  const [categoryList, setCategoryList] = useState([{ name: "", images: "" }]);
   const [deriveLink, setDeriveLink] = useState(''); // New category image link
   const [selectedClientId, setSelectedClientId] = useState('');
   useEffect(() => {
@@ -74,29 +74,28 @@ export default function Clients() {
   };
 
   const handleClickOpen = (mode, job = {}) => {
-    const loadingToastId = toast.loading('🖐️Hold on 🎁 Loading...', {
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff'
-      }
-    });
-
+    const loadingToastId = toast.loading('🖐️Hold on 🎁 Loading...');
+  
     setDialogMode(mode);
     setDialogData(job);
-
+  
+    if (mode === "editOrder" && job._id) {
+      setSelectedClientId(job._id);
+      setCategoryList(job.category || [{ name: "", images: "" }]); // ✅ set category list here
+    }
+  
     setTimeout(() => {
       setFormValues({
         name: job.name || '',
         date: job.date || '',
         imageUrl: job.image || null,
         category: job.category || '',
-        canDownload: job.canDownload || true,
-        canView: job.canView || true,
+        canDownload: job.canDownload ?? true,
+        canView: job.canView ?? true,
         pin: job.pin || '',
         url: job.url || ''
       });
-
+  
       toast.dismiss(loadingToastId);
       setOpen(true);
     }, 100);
@@ -164,15 +163,12 @@ export default function Clients() {
         });
         toast.success('News Edited Successfully!🖊️😍');
       } else if (dialogMode === 'editOrder') {
-        const newCategory = {
-          name: categoryName,
-          images: deriveLink
-        };
+        const newCategories = categoryList;
         await axiosInstance.put(
           '/cards/update-category',
           {
             id: selectedClientId,
-            category: newCategory
+            category: newCategories
           },
           {
             headers: {
@@ -180,6 +176,7 @@ export default function Clients() {
             }
           }
         );
+      
         toast.success('Category updated Successfully!🖊️😍');
       }
 
@@ -217,7 +214,22 @@ export default function Clients() {
     }
   };
 
-  const handleCategoryDelete = async () => {};
+  const handleCategoryDelete = async (categoryId) => {
+    try {
+      await axiosInstance.put("/cards/delete-category", {
+        cardId: selectedClientId,
+        categoryId: categoryId,
+      });
+  
+      toast.success("Category deleted successfully");
+  
+      // Optimistically update local state
+      setCategoryList((prev) => prev.filter((cat) => cat._id !== categoryId));
+    } catch (error) {
+      console.error("Failed to delete category", error);
+      toast.error("Failed to delete category");
+    }
+  };
 
   const handleCanDownloadStatus = async (job) => {
     try {
@@ -297,13 +309,12 @@ export default function Clients() {
             <ViewClientModal dialogData={dialogData} />
           ) : dialogMode === 'editOrder' ? (
             <EditClientModal
-              categoryName={categoryName}
-              setCategoryName={setCategoryName}
-              deriveLink={deriveLink}
-              setDeriveLink={setDeriveLink}
+              categoryList={dialogData.category}
+              setCategoryList={setCategoryList}
               selectedClientId={selectedClientId}
               setSelectedClientId={setSelectedClientId}
               jobs={jobs}
+              onDeleteCategory={handleCategoryDelete}
             />
           ) : (
             <AddClientModal

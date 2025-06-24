@@ -11,7 +11,8 @@ import {
   GlobalOutlined,
   FileDoneOutlined,
   NotificationOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  HomeOutlined
 } from "@ant-design/icons";
 
 // icons
@@ -27,7 +28,8 @@ const icons = {
   GlobalOutlined,
   FileDoneOutlined,
   NotificationOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
+  HomeOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -65,7 +67,7 @@ const components = {
       title: "Home Page Carousel",
       type: "item",
       url: "/home-page-carousel",
-      icon: icons.ReadOutlined,
+      icon: icons.HomeOutlined,
     },
     {
       id: "reviews",
@@ -74,14 +76,6 @@ const components = {
       url: "/reviews",
       icon: icons.GlobalOutlined,
     },
-    // {
-    //   id: "apply-leave",
-    //   title: "Apply Leave",
-    //   type: "item",
-    //   url: "/apply-leave",
-    //   icon: icons.KeyOutlined,
-    // },
-
     {
       id: "manage-gallary",
       title: "Manage Gallary",
@@ -89,58 +83,13 @@ const components = {
       url: "/manage-gallary",
       icon: icons.BarcodeOutlined,
     },
-
-
-    // {
-    //   id: "admincard",
-    //   title: "Admit Card",
-    //   type: "item",
-    //   url: "/admincard",
-    //   icon: icons.FileDoneOutlined,
-    // },
-    // {
-    //   id: "contactUs",
-    //   title: "Contact Us",
-    //   type: "item",
-    //   url: "/contact",
-    //   icon: icons.FileDoneOutlined,
-    // },
-
-    // {
-    //   id: "notification",
-    //   title: "Notification",
-    //   type: "item",
-    //   url: "/notification",
-    //   icon: icons.NotificationOutlined,
-    // },
-    // {
-    //   id: "highlight",
-    //   title: "Card Highlights ",
-    //   type: "item",
-    //   url: "/highlight",
-    //   icon: icons.ReadOutlined,
-    // },
-    // {
-    //   id: "banner",
-    //   title: "Banners ",
-    //   type: "item",
-    //   url: "/banner",
-    //   icon: icons.ReadOutlined,
-    // },
-    // {
-    //   id: "faqs",
-    //   title: "FAQs ",
-    //   type: "item",
-    //   url: "/faqs",
-    //   icon: icons.ReadOutlined,
-    // },
-    // {
-    //   id: "common",
-    //   title: "common",
-    //   type: "item",
-    //   url: "/common",
-    //   icon: icons.BarcodeOutlined,
-    // },
+    {
+      id: "blogs",
+      title: "Blogs",
+      type: "item",
+      url: "/blogs",
+      icon: icons.ReadOutlined,
+    },
   ],
 };
 

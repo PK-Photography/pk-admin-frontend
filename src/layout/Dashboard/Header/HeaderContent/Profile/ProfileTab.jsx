@@ -84,21 +84,21 @@ export default function ProfileTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Fetch profile data
-    const fetchProfile = async () => {
-      try {
-        const response = await axiosInstance.get('/myprofile');
-        setProfile(response.data.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch profile data');
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch profile data
+  //   const fetchProfile = async () => {
+  //     try {
+  //       const response = await axiosInstance.get('/myprofile');
+  //       setProfile(response.data.data);
+  //       setLoading(false);
+  //     } catch (err) {
+  //       setError('Failed to fetch profile data');
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchProfile();
-  }, []);
+  //   fetchProfile();
+  // }, []);
 
   const handleListItemClick = (index) => {
     setSelectedIndex(index);

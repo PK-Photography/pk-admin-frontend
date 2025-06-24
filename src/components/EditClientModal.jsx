@@ -1,93 +1,85 @@
 import React, { useEffect } from 'react';
-import { TextField, Select, MenuItem } from '@mui/material';
+import { TextField, IconButton, Button } from '@mui/material';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
 export default function EditClientModal({
-  categoryName,
-  setCategoryName,
-  deriveLink,
-  setDeriveLink,
+  categoryList,
+  setCategoryList,
   selectedClientId,
   setSelectedClientId,
   jobs
 }) {
-  // Debug logs to inspect received props
   useEffect(() => {
-    console.log('💡 EditClientModal mounted');
-    console.log('🟡 categoryName:', categoryName);
-    console.log('🟢 deriveLink:', deriveLink);
-    console.log('🔵 selectedClientId:', selectedClientId);
-    console.log('🟠 jobs:', jobs);
-  }, [categoryName, deriveLink, selectedClientId, jobs]);
+    console.log('🟠 selectedClientId:', selectedClientId);
+  }, [categoryList]);
+
+  const handleChange = (index, field, value) => {
+    const updated = [...categoryList];
+    updated[index][field] = value;
+    setCategoryList(updated);
+  };
+
+  const handleAddCategory = () => {
+    setCategoryList([...categoryList, { name: '', images: '' }]);
+  };
+
+  const handleRemoveCategory = async (index, categoryId) => {
+    if (categoryId) {
+      await onDeleteCategory(categoryId); // Call API to delete
+    } else {
+      // If not saved yet, just remove locally
+      const updated = [...categoryList];
+      updated.splice(index, 1);
+      setCategoryList(updated);
+    }
+  };
 
   return (
     <>
-      <label
-        htmlFor="Category Name"
-        style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}
-      >
-        Category Name
-      </label>
-      <TextField
-        margin="dense"
-        label="Category Name"
-        fullWidth
-        variant="outlined"
-        type="text"
-        value={categoryName}
-        onChange={(e) => {
-          console.log('✏️ Category Changed:', e.target.value);
-          setCategoryName(e.target.value);
-        }}
-        required
-      />
+      <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>Select Client</label>
       <br />
-      <br />
-
-      <label
-        id="choose-client"
-        style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}
-      >
-        Select Client
-      </label>
-      <br />
-      <Select
-        labelId="choose-client"
-        fullWidth
+      <select
+        style={{ width: '100%', padding: '10px', marginBottom: '20px' }}
         value={selectedClientId}
-        onChange={(e) => {
-          console.log('✅ Client Selected:', e.target.value);
-          setSelectedClientId(e.target.value);
-        }}
-        label="Client"
-        variant="outlined"
+        onChange={(e) => setSelectedClientId(e.target.value)}
       >
+        <option value="">-- Select Client --</option>
         {jobs.map((item) => (
-          <MenuItem key={item._id} value={item._id}>
+          <option key={item._id} value={item._id}>
             {item.name || 'Unknown'}
-          </MenuItem>
+          </option>
         ))}
-      </Select>
-      <br />
-      <br />
-      <label
-        htmlFor="Drive Link"
-        style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}
-      >
-        Drive Link
-      </label>
-      <TextField
-        margin="dense"
-        label="Drive Link"
-        fullWidth
+      </select>
+
+      {categoryList.map((cat, index) => (
+        <div key={index} style={{ marginBottom: '20px' }}>
+          <TextField
+            fullWidth
+            label="Category Name"
+            value={cat.name}
+            onChange={(e) => handleChange(index, 'name', e.target.value)}
+            style={{ marginBottom: '10px' }}
+          />
+          <TextField
+            fullWidth
+            label="Image Source"
+            value={cat.images}
+            onChange={(e) => handleChange(index, 'images', e.target.value)}
+          />
+          <IconButton onClick={() => handleRemoveCategory(index)} style={{ marginTop: '10px' }}>
+            <DeleteOutlined style={{ color: 'red' }} />
+          </IconButton>
+        </div>
+      ))}
+
+      <Button
         variant="outlined"
-        type="text"
-        value={deriveLink}
-        onChange={(e) => {
-          console.log('🔗 Drive Link Changed:', e.target.value);
-          setDeriveLink(e.target.value);
-        }}
-        required
-      />
+        color="primary"
+        onClick={handleAddCategory}
+        startIcon={<PlusOutlined />}
+      >
+        Add Category
+      </Button>
     </>
   );
 }

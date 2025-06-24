@@ -66,22 +66,22 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  useEffect(() => {
-    // Fetch profile data
-    const fetchProfile = async () => {
-      try {
-        const response = await axiosInstance.get('/myprofile');
-        setProfile(response.data.data);
-        // console.log("@@@@@@@@@",response);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch profile data');
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   // Fetch profile data
+  //   const fetchProfile = async () => {
+  //     try {
+  //       const response = await axiosInstance.get('/myprofile');
+  //       setProfile(response.data.data);
+  //       // console.log("@@@@@@@@@",response);
+  //       setLoading(false);
+  //     } catch (err) {
+  //       setError('Failed to fetch profile data');
+  //       setLoading(false);
+  //     }
+  //   };
   
-    fetchProfile();
-  }, []);
+  //   fetchProfile();
+  // }, []);
   
 
   const theme = useTheme();

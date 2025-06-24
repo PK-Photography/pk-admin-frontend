@@ -11,16 +11,8 @@ import AdminManage from "pages/AdminManage";
 import HomePageCarousel from "pages/HomePageCarousel";
 import Reviews from "pages/Reviews";
 import Gallary from "pages/Gallary";
+import Blogs from "pages/Blogs";
 import UserManagement from "pages/UserManagement";
-// import AdminManage from "pages/AdminManage";
-// import MasterProtecterRoute from "./MasterProtecterRoute";
-// import EmployeeManagement from "pages/EmployeeManagement";
-// import ManageDepartment from "pages/ManageDepartment";
-// import Attendance from "pages/Attendance";
-// import EmployeeDetails from "pages/EmployeeDetails";
-// import Leave from "pages/Leave";
-// import ApplyLeaves from "pages/ApplyLeaves";
-// import EmployeeProtectedRoute from "./EmployeeProtectedRoute";
 
 // Lazy loading of the components
 const Color = Loadable(lazy(() => import("pages/component-overview/color")));
@@ -78,60 +70,13 @@ const MainRoutes = {
           element: <Gallary />,
         },
         {
+          path: "/blogs",
+          element: <Blogs />,
+        },
+        {
           path: "/reviews",
           element: <Reviews />,
         },
-
-
-
-
-
-        // Admin management section wrapped by MasterProtecterRoute
-        // {
-        //   element: <MasterProtecterRoute />, // Wrapping this section with MasterProtecterRoute
-        //   children: [
-        //     {
-        //       path: "admin-management",
-        //       element: <AdminManage />, // Admin management page
-        //     },
-        //     {
-        //       path: "employee-management",
-        //       element: <EmployeeManagement />, // Dashboard page
-        //     },
-        //     {
-        //       path: "/manage-department",
-        //       element: <ManageDepartment/>, // Dashboard page
-        //     },
-        //     {
-        //       path: "/employees-deatails",
-        //       element: <EmployeeDetails/>, // Dashboard page
-        //     },
-        //     {
-        //       path: "/attendance",
-        //       element: <Attendance/>, // Dashboard page
-        //     },
-        //     {
-        //       path: "/manage-leaves",
-        //       element: <Leave />, // Dashboard page
-        //     },
-        //     {
-        //       path: "/dashboard/manage-leaves",
-        //       element: <Leave />, // Dashboard page
-        //     },
-        //   ],
-        // },
-        // {
-        //   element: <EmployeeProtectedRoute />, // Wrapping this section with MasterProtecterRoute
-        //   children: [
-        //     {
-        //       path: "apply-leave",
-        //       element: <ApplyLeaves />, // Dashboard page
-        //     },
-
-
-
-        //   ],
-        // },
       ],
     },
   ],
