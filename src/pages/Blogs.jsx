@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from 'utils/axiosInstance';
+import axiosInstance from "utils/axiosInstance";
 import { toast } from "react-hot-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -15,7 +15,7 @@ const BlogAdminPanel = () => {
     content: "",
     author: "",
     date: "",
-    image: "",
+    image: null
   });
 
   useEffect(() => {
@@ -32,18 +32,29 @@ const BlogAdminPanel = () => {
   };
 
   const handleChange = (e) => {
-    setBlogData({ ...blogData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setBlogData({ ...blogData, image: files[0] });
+    } else {
+      setBlogData({ ...blogData, [name]: value });
+    }
   };
 
   const handleSubmit = async () => {
     try {
+      const formData = new FormData();
+      Object.keys(blogData).forEach((key) => {
+        if (blogData[key]) formData.append(key, blogData[key]);
+      });
+
       if (formMode === "add") {
-        await axiosInstance.post("/blogs", blogData);
+        await axiosInstance.post("/blogs", formData);
         toast.success("Blog created");
       } else {
-        await axiosInstance.put(`/blogs/${selectedId}`, blogData);
+        await axiosInstance.put(`/blogs/${selectedId}`, formData);
         toast.success("Blog updated");
       }
+
       fetchBlogs();
       setOpen(false);
       setBlogData({
@@ -52,7 +63,7 @@ const BlogAdminPanel = () => {
         content: "",
         author: "",
         date: "",
-        image: "",
+        image: null
       });
     } catch (err) {
       toast.error("Failed to save blog");
@@ -62,7 +73,7 @@ const BlogAdminPanel = () => {
   const handleEdit = (blog) => {
     setFormMode("edit");
     setSelectedId(blog._id);
-    setBlogData(blog);
+    setBlogData({ ...blog, image: null });
     setOpen(true);
   };
 
@@ -91,17 +102,10 @@ const BlogAdminPanel = () => {
                 content: "",
                 author: "",
                 date: "",
-                image: "",
+                image: null
               });
             }}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#007BFF",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
+            style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}
           >
             Add Blog
           </button>
@@ -121,14 +125,10 @@ const BlogAdminPanel = () => {
               <tr key={blog._id} style={{ borderBottom: "1px solid #ddd" }}>
                 <td style={tdStyle}>{blog.title}</td>
                 <td style={tdStyle}>{blog.author}</td>
-                <td style={tdStyle}>{blog.date}</td>
+                <td style={tdStyle}>{blog.date || blog.createdAt?.split("T")[0]}</td>
                 <td style={tdStyle}>
-                  <button onClick={() => handleEdit(blog)} style={{ color: "#007BFF", marginRight: "10px", cursor: "pointer", background: "none", border: "none" }}>
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(blog._id)} style={{ color: "#dc3545", cursor: "pointer", background: "none", border: "none" }}>
-                    Delete
-                  </button>
+                  <button onClick={() => handleEdit(blog)} style={{ color: "#007BFF", marginRight: "10px", cursor: "pointer", background: "none", border: "none" }}>Edit</button>
+                  <button onClick={() => handleDelete(blog._id)} style={{ color: "#dc3545", cursor: "pointer", background: "none", border: "none" }}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -137,72 +137,15 @@ const BlogAdminPanel = () => {
 
         {open && (
           <div>
-            <h3 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "20px" }}>
-              {formMode === "add" ? "Add New Blog" : "Edit Blog"}
-            </h3>
+            <h3 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "20px" }}>{formMode === "add" ? "Add New Blog" : "Edit Blog"}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                value={blogData.title}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-              <input
-                type="text"
-                name="subtitle"
-                placeholder="Subtitle"
-                value={blogData.subtitle}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-              <input
-                type="text"
-                name="author"
-                placeholder="Author"
-                value={blogData.author}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-              <input
-                type="date"
-                name="date"
-                value={blogData.date}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-              <input
-                type="text"
-                name="image"
-                placeholder="Image URL"
-                value={blogData.image}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-              <div>
-                <ReactQuill
-                  value={blogData.content}
-                  onChange={(val) => setBlogData({ ...blogData, content: val })}
-                  style={{ backgroundColor: "#fff", borderRadius: "6px" }}
-                  placeholder="Write your blog content..."
-                />
-              </div>
-              <button
-                onClick={handleSubmit}
-                style={{
-                  marginTop: "20px",
-                  padding: "12px",
-                  backgroundColor: "#28a745",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                {formMode === "add" ? "Create Blog" : "Update Blog"}
-              </button>
+              <input type="text" name="title" placeholder="Title" value={blogData.title} onChange={handleChange} style={inputStyle} />
+              <input type="text" name="subtitle" placeholder="Subtitle" value={blogData.subtitle} onChange={handleChange} style={inputStyle} />
+              <input type="text" name="author" placeholder="Author" value={blogData.author} onChange={handleChange} style={inputStyle} />
+              <input type="date" name="date" value={blogData.date} onChange={handleChange} style={inputStyle} />
+              <input type="file" name="image" onChange={handleChange} style={inputStyle} />
+              <ReactQuill value={blogData.content} onChange={(val) => setBlogData({ ...blogData, content: val })} style={{ backgroundColor: "#fff", borderRadius: "6px" }} placeholder="Write your blog content..." />
+              <button onClick={handleSubmit} style={{ marginTop: "20px", padding: "12px", backgroundColor: "#28a745", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>{formMode === "add" ? "Create Blog" : "Update Blog"}</button>
             </div>
           </div>
         )}
