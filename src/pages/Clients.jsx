@@ -163,19 +163,15 @@ export default function Clients() {
         });
         toast.success('News Edited Successfully!🖊️😍');
       } else if (dialogMode === 'editOrder') {
-        const newCategories = categoryList;
-        await axiosInstance.put(
-          '/cards/update-category',
-          {
-            id: selectedClientId,
-            category: newCategories
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        );
+        if (!selectedClientId) {
+          toast.error("No client selected!");
+          return;
+        }
+      
+        await axiosInstance.put('/cards/update-category', {
+          id: selectedClientId,
+          category: categoryList
+        });
       
         toast.success('Category updated Successfully!🖊️😍');
       }
@@ -309,7 +305,7 @@ export default function Clients() {
             <ViewClientModal dialogData={dialogData} />
           ) : dialogMode === 'editOrder' ? (
             <EditClientModal
-              categoryList={dialogData.category}
+              categoryList={categoryList}
               setCategoryList={setCategoryList}
               selectedClientId={selectedClientId}
               setSelectedClientId={setSelectedClientId}
