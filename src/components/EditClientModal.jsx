@@ -7,7 +7,8 @@ export default function EditClientModal({
   setCategoryList,
   selectedClientId,
   setSelectedClientId,
-  jobs
+  jobs,
+  onDeleteCategory
 }) {
   useEffect(() => {
     console.log('🟠 selectedClientId:', selectedClientId);
@@ -66,7 +67,7 @@ export default function EditClientModal({
             value={cat.images}
             onChange={(e) => handleChange(index, 'images', e.target.value)}
           />
-          <IconButton onClick={() => handleRemoveCategory(index)} style={{ marginTop: '10px' }}>
+          <IconButton onClick={() => handleRemoveCategory(index, cat._id)} style={{ marginTop: '10px' }}>
             <DeleteOutlined style={{ color: 'red' }} />
           </IconButton>
         </div>
