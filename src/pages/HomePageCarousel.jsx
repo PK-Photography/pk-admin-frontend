@@ -208,7 +208,8 @@ const HomePageCarousel = () => {
                         >
                             <MenuItem value="Desktop">Desktop</MenuItem>
                             <MenuItem value="mobile">Mobile</MenuItem>
-                            <MenuItem value="homepage">Homepage</MenuItem>
+                            <MenuItem value="homepage_web">Homepage Desktop</MenuItem>
+                            <MenuItem value="homepage_mobile">Homepage Mobile</MenuItem>
                         </Select>
                     </FormControl>
                 </DialogContent>
