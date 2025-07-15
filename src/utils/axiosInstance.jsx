@@ -6,7 +6,6 @@ const baseURL = "https://pk-photography-backend.onrender.com/api/v1";
 // Create an Axios instance
 const axiosInstance = axios.create({
   baseURL,
-
 });
 
 // Add a request interceptor to set the Authorization header and content type
