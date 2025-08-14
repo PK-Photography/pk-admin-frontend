@@ -12,8 +12,9 @@ import {
   FileDoneOutlined,
   NotificationOutlined,
   UsergroupAddOutlined,
-  HomeOutlined
-} from "@ant-design/icons";
+  HomeOutlined,
+  SolutionOutlined
+} from '@ant-design/icons';
 
 // icons
 const icons = {
@@ -29,7 +30,8 @@ const icons = {
   FileDoneOutlined,
   NotificationOutlined,
   UsergroupAddOutlined,
-  HomeOutlined
+  HomeOutlined,
+  SolutionOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -89,6 +91,13 @@ const components = {
       type: "item",
       url: "/blogs",
       icon: icons.ReadOutlined,
+    },
+    {
+      id: "job-applications",
+      title: "Job Applications",
+      type: "item",
+      url: "/jobApplication",
+      icon: icons.SolutionOutlined,
     },
   ],
 };
