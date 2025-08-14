@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import 'antd/dist/reset.css'; 
+
 
 // scroll bar
 import "simplebar-react/dist/simplebar.min.css";

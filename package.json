@@ -51,6 +51,7 @@
     "@tiptap/react": "^2.8.0",
     "@tiptap/starter-kit": "^2.8.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "antd": "^5.27.0",
     "apexcharts": "^3.49.0",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",

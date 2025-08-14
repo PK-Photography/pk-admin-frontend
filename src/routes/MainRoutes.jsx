@@ -13,6 +13,7 @@ import Reviews from "pages/Reviews";
 import Gallary from "pages/Gallary";
 import Blogs from "pages/Blogs";
 import UserManagement from "pages/UserManagement";
+import JobApplication from "pages/jobApplication";
 
 // Lazy loading of the components
 const Color = Loadable(lazy(() => import("pages/component-overview/color")));
@@ -76,6 +77,10 @@ const MainRoutes = {
         {
           path: "/reviews",
           element: <Reviews />,
+        },
+         {
+          path: "/jobApplication",
+          element: <JobApplication />,
         },
       ],
     },
