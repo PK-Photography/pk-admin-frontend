@@ -33,11 +33,13 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: '#008080',
-    color: theme.palette.common.white
+    color: theme.palette.common.white,
+     textAlign: 'center',
   },
 
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14
+    fontSize: 14,
+     textAlign: 'center',
   }
 }));
 
@@ -228,7 +230,9 @@ export default function Bookings() {
             <TableRow>
               <StyledTableCell>Sr. No.</StyledTableCell>
               <StyledTableCell>name</StyledTableCell>
-              <StyledTableCell>Email</StyledTableCell>
+              <StyledTableCell>Date</StyledTableCell>
+              <StyledTableCell>Time</StyledTableCell>
+              <StyledTableCell>Created At</StyledTableCell>
               <StyledTableCell>phone</StyledTableCell>
               <StyledTableCell>address</StyledTableCell>
               <StyledTableCell>service</StyledTableCell>
@@ -258,7 +262,13 @@ export default function Bookings() {
                     {job.name}
                   </StyledTableCell>
                   <StyledTableCell component="th" scope="row">
-                    {job.email || '-'}
+                    {new Date(job.date).toLocaleDateString('en-GB') || '-'}
+                  </StyledTableCell>
+                  <StyledTableCell component="th" scope="row">
+                    {job.time || '-'}
+                  </StyledTableCell>
+                  <StyledTableCell component="th" scope="row">
+                     {new Date(job.createdAt).toLocaleString('en-GB') || '-'}
                   </StyledTableCell>
                   <StyledTableCell component="th" scope="row">
                     {job.phone || '-'}
