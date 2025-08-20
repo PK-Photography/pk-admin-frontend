@@ -123,16 +123,9 @@ const SubServices = () => {
       dataIndex: 'imageUrl',
       key: 'imageUrl',
       render: (img) =>
-        img ?
-    //    (
-    //       <img
-    //         src={`${process.env.REACT_APP_S3_BASE_URL}/${img}`}
-    //         alt="subservice"
-    //         style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6 }}
-    //       />
-    //     )
-        "img"
-         : (
+        img ? (
+          <img src={img} alt="subservice" style={{ width: 100, height: 120, objectFit: 'fit', borderRadius: 6 }} />
+        ) : (
           <span style={{ color: '#999' }}>No Image</span>
         )
     },
@@ -162,7 +155,7 @@ const SubServices = () => {
       dataIndex: 'time',
       key: 'time'
     },
-  
+
     {
       title: 'Description',
       dataIndex: 'description',
