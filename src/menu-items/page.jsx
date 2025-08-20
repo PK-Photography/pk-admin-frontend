@@ -3,6 +3,8 @@ import {
   LoginOutlined,
   ProfileOutlined,
   SettingOutlined,
+  AppstoreOutlined,
+  BranchesOutlined,
 } from "@ant-design/icons";
 
 // icons
@@ -10,6 +12,8 @@ const icons = {
   LoginOutlined,
   ProfileOutlined,
   SettingOutlined,
+  AppstoreOutlined,
+  BranchesOutlined,
 };
 
 // ==============================|| MENU ITEMS - EXTRA actions ||============================== //
@@ -25,6 +29,20 @@ const actions = {
       type: "item",
       url: "/admin-management",
       icon: icons.SettingOutlined,
+    },
+    {
+      id: "Services",
+      title: " Services",
+      type: "item",
+      url: "/services",
+      icon: icons.AppstoreOutlined,
+    },
+    {
+      id: "Sub-Service",
+      title: "Sub-Services",
+      type: "item",
+      url: "/subServices",
+      icon: icons.BranchesOutlined,
     },
     {
       id: "logout",
