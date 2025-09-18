@@ -22,6 +22,7 @@ import {
 import toast from 'react-hot-toast';
 import axiosInstance from "utils/axiosInstance";
 import { FaBan } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 const roles = ["Viewer", "Writer", "Client", "Subscriber"];
 
 export default function UserManagement() {
@@ -32,6 +33,7 @@ export default function UserManagement() {
     const [banReason, setBanReason] = useState("");
     const [newRole, setNewRole] = useState("");
     const [loading, setLoading] = useState(true);
+      const navigate = useNavigate();
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -52,6 +54,10 @@ export default function UserManagement() {
         setSelectedUser(user);
         setNewRole(role);
         setOpenRole(true);
+    };
+
+       const handleViewFavourites = (user) => {
+        navigate("/favourites", { state: { favourites: user.favourite } });
     };
 
     const confirmRoleChange = async () => {
@@ -110,6 +116,7 @@ export default function UserManagement() {
                         <TableCell style={{ color: "#fff" }}>isverify</TableCell>
                         <TableCell style={{ color: "#fff" }}>Joined at</TableCell>
                         <TableCell style={{ color: "#fff" }}>Role</TableCell>
+                         <TableCell style={{ color: "#fff" }}>View Favourites</TableCell>
                         <TableCell style={{ color: "red" }}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
@@ -154,6 +161,17 @@ export default function UserManagement() {
                                         ))}
                                     </Select>
                                 </TableCell>
+
+                                 <TableCell>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => handleViewFavourites(user)}
+                        >
+                            View
+                        </Button>
+                    </TableCell>
+
                                 <TableCell>
                                     <Typography variant="h6" onClick={() => handleOpenBanDialog(user)} style={{ display: "flex", alignItems: "center", gap: "5px", color: "red", cursor: "pointer" }}>
                                         <FaBan style={{ fontSize: "15px", }} /> Ban user
