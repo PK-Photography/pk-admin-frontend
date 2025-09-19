@@ -16,7 +16,8 @@ import UserManagement from "pages/UserManagement";
 import JobApplication from "pages/jobApplication";
 import Services from "pages/Services";
 import SubServices from "pages/subService";
-import Talent from "pages/Talent";          
+import Talent from "pages/Talent";      
+import Favourites from "pages/favourites";    
 
 // Lazy loading of the components
 const Color = Loadable(lazy(() => import("pages/component-overview/color")));
@@ -96,6 +97,10 @@ const MainRoutes = {
         {
           path: "/talents",
           element: <Talent />,
+        },
+        {
+          path: "/favourites",
+          element: <Favourites />,
         },
 
       ],
