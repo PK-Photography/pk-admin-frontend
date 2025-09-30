@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, Spin } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axiosInstance from 'utils/axiosInstance';
+import ReactQuill from 'react-quill';
 
 const { Title } = Typography;
 
@@ -190,7 +191,11 @@ const Blogs = () => {
             <Input placeholder="Default: PK Photography" />
           </Form.Item>
           <Form.Item name="content" label="Content" rules={[{ required: true, message: 'Please enter content' }]}>
-            <Input.TextArea rows={6} />
+            <ReactQuill
+              theme="snow"
+              style={{ height: 200, marginBottom: 40 }}
+              onChange={(value) => form.setFieldsValue({ content: value })}
+            />
           </Form.Item>
           <Form.Item
             name="image"
