@@ -12,6 +12,7 @@ import HomePageCarousel from "pages/HomePageCarousel";
 import Reviews from "pages/Reviews";
 import Gallary from "pages/Gallary";
 import Blogs from "pages/Blogs";
+import WeddingBlogs from "pages/WeddingBlogs";
 import UserManagement from "pages/UserManagement";
 import JobApplication from "pages/jobApplication";
 import Services from "pages/Services";
@@ -77,6 +78,10 @@ const MainRoutes = {
         {
           path: "/blogs",
           element: <Blogs />,
+        },
+        {
+          path: "/wedding-blogs",
+          element: <WeddingBlogs />,
         },
         {
           path: "/reviews",
