@@ -94,6 +94,15 @@ const components = {
       url: "/blogs",
       icon: icons.ReadOutlined,
     },
+
+    {
+      id: "wedding-blogs",
+      title: "Wedding Blogs",
+      type: "item",
+      url: "/wedding-blogs",
+      icon: icons.ReadOutlined,
+    },
+
     {
       id: "job-applications",
       title: "Job Applications",
