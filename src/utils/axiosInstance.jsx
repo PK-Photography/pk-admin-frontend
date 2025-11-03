@@ -1,6 +1,6 @@
 import axios from "axios";
 import { handleLogout } from "../pages/authentication/Logout"; // Import your logout function
-const baseURL = "https://pk-photography-backend.onrender.com/api/v1";
+const baseURL = "https://pk.thetechthingy.com/api/v1";
 // const baseURL = "http://localhost:8081/api/v1";
 
 // Create an Axios instance
