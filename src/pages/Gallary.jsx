@@ -19,8 +19,27 @@ const categoriesList = [
     'Boudoir',
     'E-Commerce',
     'Food',
-    'RealEstate',
+    'Real Estate',
     'Design',
+    'weddings',
+    'events',
+    'live-streaming',
+    'portraits-headshots',
+    'family-kids',
+    'fashion-shoots',
+    'editorial-portfolio',
+    'boudoir-shoots',
+    'brand-content',
+    'product-ecommerce',
+    'food-photography',
+    'corporate-industrial',
+    'real-estate-architectural',
+    'influencer-celebrity',
+    'podcast-production',
+    'editing-retouching',
+    'album-design',
+    'drone-services',
+    'design-services'
 ];
 
 const Gallary = () => {
