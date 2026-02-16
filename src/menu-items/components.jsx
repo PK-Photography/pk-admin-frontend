@@ -117,6 +117,13 @@ const components = {
       url: "/talents",
       icon: icons.StarOutlined,
     },
+    {
+      id: "shaadi-films",
+      title: "Shaadi Films",
+      type: "item",
+      url: "/shadiFilms",
+      icon: icons.FileDoneOutlined,
+    },
   ],
 };
 
