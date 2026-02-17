@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, Spin, DatePicker } from 'antd';
+import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, Spin, DatePicker, Select } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import axiosInstance from 'utils/axiosInstance';
+import { Link } from 'react-router-dom';
 
 const { Title } = Typography;
 
@@ -13,11 +14,19 @@ const ShaadiFilmsAlbums = () => {
   const [editingAlbum, setEditingAlbum] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const user = localStorage.getItem("user");
+  const [users, setUsers] = useState([]);
 
   const [form] = Form.useForm();
 
-
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get('/user/all');
+      setUsers(res.data || []);
+    } catch (error) {
+      console.error(error);
+      message.error('Failed to fetch users');
+    }
+  };
 
   // Fetch albums
   const fetchAlbums = async (pageNo = 1) => {
@@ -38,7 +47,7 @@ const ShaadiFilmsAlbums = () => {
   const handleSave = async (values) => {
     const formData = new FormData();
     formData.append('name', values.name);
-    if(user) formData.append('userId', user._id);
+    formData.append('userId', values.userId);
     formData.append('event_date', values.event_date.toISOString());
 
     if (values.file?.length > 0) {
@@ -79,6 +88,7 @@ const ShaadiFilmsAlbums = () => {
     setEditingAlbum(record);
     form.setFieldsValue({
       name: record.name,
+      userId: record.userId,
       event_date: record.event_date ? dayjs(record.event_date) : null
     });
     setIsModalOpen(true);
@@ -92,6 +102,7 @@ const ShaadiFilmsAlbums = () => {
 
   useEffect(() => {
     fetchAlbums(page);
+    fetchUsers();
   }, [page]);
 
   const columns = [
@@ -179,7 +190,28 @@ const ShaadiFilmsAlbums = () => {
           </Form.Item>
 
           <Form.Item name="event_date" label="Event Date" rules={[{ required: true, message: 'Please select event date' }]}>
-            <DatePicker showTime style={{ width: '100%' }} />
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item
+            name="userId"
+            label={
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Select User</span>
+                <Link to="/user-management" style={{ fontSize: 13, paddingLeft: '6px' , paddingTop: '2px', textDecoration:'underline' }}>
+                   Create New User
+                </Link>
+              </div>
+            }
+            rules={[{ required: true, message: 'Please select user' }]}
+          >
+            <Select placeholder="Select user" showSearch optionFilterProp="children">
+              {users.map((user) => (
+                <Select.Option key={user.id} value={user.id}>
+                  {user.fullName} ({user.email})
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
