@@ -1,0 +1,22 @@
+// Services from https://pkphotography.in/services
+export const PKPHOTOGRAPHY_SERVICES = [
+  { name: 'Wedding Photography & Videography', description: 'Complete photo and video coverage for your wedding day, capturing every moment of your celebration.', category: 'Weddings & Events' },
+  { name: 'Event Photography and Videography', description: 'Professional coverage for corporate functions, parties, anniversaries, and social gatherings.', category: 'Weddings & Events' },
+  { name: 'Portraits & Headshots', description: 'Personalized sessions for individuals, professionals, and artists to capture your unique personality.', category: 'Portraiture' },
+  { name: 'Editorial & Portfolio', description: 'Story-driven visuals for publication or building a stunning portfolio to showcase your talent as an artist.', category: 'Fashion & Editorial' },
+  { name: 'Live Streaming', description: "Broadcast your event live to guests who can't be there in person with our professional streaming services.", category: 'Weddings & Events' },
+  { name: 'Family & Kids', description: 'Create lasting memories with your loved ones, from family gatherings to capturing precious childhood moments.', category: 'Portraiture' },
+  { name: 'Fashion Shoots & Lookbooks', description: 'High-quality fashion photography and videography for your brand, portfolio, or lookbook.', category: 'Fashion & Editorial' },
+  { name: 'Boudoir Shoots', description: 'Empowering and intimate photography sessions that celebrate you in a private, comfortable setting.', category: 'Fashion & Editorial' },
+  { name: 'Brand & Content', description: 'Visual content that tells your brand\'s story, perfect for websites, social media, and marketing campaigns.', category: 'Commercial & Brands' },
+  { name: 'Product & E-Commerce', description: 'Crisp, clean, and consistent images of your products for your online store, catalog, or marketplace.', category: 'Commercial & Brands' },
+  { name: 'Food Photography', description: 'Mouth-watering photos for restaurants, menus, and social media that make your dishes look delicious.', category: 'Commercial & Brands' },
+  { name: 'Corporate & Industrial', description: 'High-impact video and photography for corporate branding, industrial processes, and marketing campaigns.', category: 'Commercial & Brands' },
+  { name: 'Real Estate & Architectural', description: 'High-quality photos, videos, and drone footage to make your property listings and projects stand out.', category: 'Property' },
+  { name: 'Influencer & Celebrity Content', description: 'Professional, discreet photography and videography for public figures and social media content creation.', category: 'Influencer & Celebrity' },
+  { name: 'Podcast Production', description: 'Professional audio and multi-camera video production for podcasts, from recording to final edits.', category: 'Post-Production' },
+  { name: 'Photo & Video Editing', description: 'Professional photo retouching and cinematic video editing for social media, reels, teasers, and more.', category: 'Post-Production' },
+  { name: 'Album Design & Printing', description: 'Beautifully designed, custom photo albums to preserve your cherished memories for a lifetime.', category: 'Post-Production' },
+  { name: 'Drone Photography & Videography', description: 'Stunning aerial shots to give a unique perspective to your project, event, or property listing.', category: 'Property' },
+  { name: 'Design Services', description: 'Custom graphic design to complement your brand, from social media templates to marketing materials.', category: 'Post-Production' },
+];

@@ -1,279 +1,197 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { DataGrid } from '@mui/x-data-grid';
-import { Button, CircularProgress, Box, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, MenuItem, Select, InputLabel, FormControl, Checkbox, ListItemText } from '@mui/material';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    CircularProgress,
+} from '@mui/material';
+import { HomeOutlined, MenuOutlined, EditOutlined } from '@ant-design/icons';
 import axiosInstance from 'utils/axiosInstance';
-
-const categoriesList = [
-    'All',
-    'Portfolio',
-    'Portrait',
-    'Headshots',
-    'Editorial',
-    'Celebrity',
-    'Ads',
-    'Wedding',
-    'Boudoir',
-    'E-Commerce',
-    'Food',
-    'RealEstate',
-    'Design',
-];
+import { PKPHOTOGRAPHY_SERVICES } from 'constants/pkphotographyServices';
 
 const Gallary = () => {
-    const [images, setImages] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [imageName, setImageName] = useState('');
-    const [subtitle, setSubtitle] = useState('');
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
-    const [deleteImageId, setDeleteImageId] = useState(null);
-    const [categories, setCategories] = useState(['All']);  // State to hold selected categories
-    const [position, setPosition] = useState('');
-
-    // Fetch all gallery images
-    const fetchImages = async () => {
-        setLoading(true);
-        try {
-            const response = await axiosInstance.get('/gallery/all');
-            setImages(response.data.data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            toast.error('Error fetching images');
-        }
-    };
+    const navigate = useNavigate();
+    const [apiServices, setApiServices] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchImages();
+        const fetchServices = async () => {
+            try {
+                const res = await axiosInstance.get('/services');
+                setApiServices(Array.isArray(res.data) ? res.data : []);
+            } catch {
+                setApiServices([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchServices();
     }, []);
 
-    // Handle save image (upload or update)
-    const handleSave = async () => {
-        if (!imageName || !subtitle || categories.length === 0 || (!imageFile && !selectedImage)) {
-            toast.error('Please provide all required fields');
-            return;
-        }
-    
-        const formData = new FormData();
-        formData.append('imageName', imageName);
-        formData.append('subtitle', subtitle);
-        formData.append('position', position || 0);
-        
-        // Directly append categories as an array
-        categories.forEach((category) => formData.append('categories[]', category)); // Use 'categories[]' to handle multiple values
-        
-        if (imageFile) formData.append('image', imageFile);
-    
-        let toastId;
-        try {
-            setLoading(true);
-            toastId = toast.loading('Uploading image, please wait...');
-    
-            // If selectedImage exists, it's an update, else a new upload
-            if (selectedImage) {
-                // Log the formData to see if all data is correct
-                console.log('Updating image with formData:', formData);
-                await axiosInstance.put(`/gallery/update/${selectedImage.id}`, formData);
-                toast.success('Image updated successfully', { id: toastId });
-            } else {
-                await axiosInstance.post('/gallery/upload', formData);
-                toast.success('Image uploaded successfully', { id: toastId });
-            }
-    
-            fetchImages();
-            setOpen(false);
-            setImagePreview('');
-            setCategories([]);  // Clear categories after save
-        } catch (error) {
-            console.error('Error saving image:', error);
-            toast.error('Error saving image', { id: toastId });
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    // Handle delete image
-    const handleDeleteConfirm = async () => {
-        try {
-            setLoading(true);
-            await axiosInstance.delete(`/gallery/delete/${deleteImageId}`);
-            toast.success('Image deleted successfully');
-            fetchImages();
-            setDeleteDialogOpen(false);
-        } catch (error) {
-            toast.error('Error deleting image');
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Merge pkphotography.in list with API: each website service gets _id and imageUrl if we have a match by name
+    const displayServices = PKPHOTOGRAPHY_SERVICES.map((web) => {
+        const nameKey = (web.name || '').trim().toLowerCase();
+        const matched = apiServices.find((s) => (s.name || '').trim().toLowerCase() === nameKey);
+        return {
+            ...web,
+            _id: matched?._id,
+            imageUrl: matched?.imageUrl,
+        };
+    });
 
-    const columns = [
-        { field: 'imageName', headerName: 'Image Name', width: 300 },
-        { field: 'subtitle', headerName: 'Subtitle', width: 300 },
-        { field: 'categories', headerName: 'Categories', width: 300 },
-        { field: 'position', headerName: 'Position', width: 120 },
-        {
-            field: 'imageUrl',
-            headerName: 'Image',
-            width: 150,
-            renderCell: (params) => (
-                <img
-                    src={params.value}
-                    alt={params.row.imageName}
-                    style={{ width: '100px', height: '50px', objectFit: 'cover' }}
-                />
-            ),
-        },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            width: 200,
-            renderCell: (params) => (
-                <>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                            setSelectedImage(params.row);
-                            setImageName(params.row.imageName);
-                            setSubtitle(params.row.subtitle);
-                            setImagePreview(params.row.imageUrl);
-                            setCategories(params.row.categories || []);  // Set selected categories
-                            setPosition(params.row.position || '');
-                            setOpen(true);
-                        }}
-                    >
-                        Edit
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => {
-                            setDeleteImageId(params.row.id);
-                            setDeleteDialogOpen(true);
-                        }}
-                        style={{ marginLeft: 10 }}
-                    >
-                        Delete
-                    </Button>
-                </>
-            ),
-        },
-    ];
+    const openEditPageImages = (svc) => {
+        if (svc._id) {
+            navigate(`/manage-gallary/service/${svc._id}`);
+        } else {
+            navigate('/manage-gallary/service/new', {
+                state: {
+                    serviceName: svc.name,
+                    category: svc.category,
+                    description: svc.description,
+                },
+            });
+        }
+    };
 
     return (
-        <Box padding={3}>
-            <ToastContainer />
-
-            <Button variant="contained" color="secondary" onClick={() => setOpen(true)} style={{ marginBottom: 16 }}>
-                Add Image
-            </Button>
+        <Box sx={{ p: 3, maxWidth: 900, mx: 'auto' }}>
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+                Manage Gallery
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Manage images for your homepage and individual service pages on{' '}
+                <Typography component="a" href="https://pkphotography.in/" target="_blank" rel="noopener noreferrer" sx={{ color: 'primary.main' }}>
+                    pkphotography.in
+                </Typography>
+                .
+            </Typography>
 
             {loading ? (
-                <CircularProgress />
+                <Box display="flex" justifyContent="center" py={4}>
+                    <CircularProgress />
+                </Box>
             ) : (
-                <div style={{ height: 500, width: '100%' }}>
-                    <DataGrid
-                        rows={images.map((img) => ({ ...img, id: img._id }))}
-                        columns={columns}
-                        pageSize={5}
-                    />
-                </div>
+                <>
+                    {/* Manage Homepage */}
+                    <Card variant="outlined" sx={{ mb: 2, borderRadius: 2 }}>
+                        <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+                                <HomeOutlined style={{ color: 'inherit', marginTop: 2 }} />
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="h6" fontWeight={600}>
+                                        Manage Homepage
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Update the main hero section and category card images on your homepage.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{ pl: 4.5, pt: 1 }}>
+                                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                                    Hero Section & Category Images
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                    Update background media, text, and category card thumbnails.
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    startIcon={<EditOutlined />}
+                                    onClick={() => navigate('/manage-gallary/edit-homepage')}
+                                >
+                                    Edit Homepage
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+
+                    {/* Manage Service Pages - from pkphotography.in/services, UI per screenshot */}
+                    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+                        <CardContent sx={{ '&:last-child': { pb: 3 } }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
+                                <MenuOutlined style={{ color: 'inherit', marginTop: 2 }} />
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="h6" fontWeight={600}>
+                                        Manage Service Pages
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Update all images for your individual service pages.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {displayServices.map((svc) => (
+                                    <Box
+                                        key={svc.name}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 2,
+                                            p: 2,
+                                            borderRadius: 2,
+                                            bgcolor: 'grey.100',
+                                            border: '1px solid',
+                                            borderColor: 'grey.200',
+                                        }}
+                                    >
+                                        {svc.imageUrl ? (
+                                            <Box
+                                                component="img"
+                                                src={svc.imageUrl}
+                                                alt=""
+                                                sx={{
+                                                    width: 80,
+                                                    height: 80,
+                                                    objectFit: 'cover',
+                                                    borderRadius: 1.5,
+                                                    bgcolor: 'grey.300',
+                                                    flexShrink: 0,
+                                                }}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: 80,
+                                                    height: 80,
+                                                    borderRadius: 1.5,
+                                                    bgcolor: 'grey.300',
+                                                    flexShrink: 0,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <Typography variant="caption" color="text.secondary">
+                                                    No image
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                                            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.25 }}>
+                                                {svc.name}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {svc.category}
+                                            </Typography>
+                                        </Box>
+                                        <Button
+                                            variant="outlined"
+                                            size="medium"
+                                            startIcon={<EditOutlined />}
+                                            onClick={() => openEditPageImages(svc)}
+                                            sx={{ flexShrink: 0 }}
+                                        >
+                                            Edit Page Images
+                                        </Button>
+                                    </Box>
+                                ))}
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </>
             )}
-
-            <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle>{selectedImage ? 'Edit Image' : 'Add Image'}</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        margin="dense"
-                        label="Image Name"
-                        type="text"
-                        fullWidth
-                        value={imageName}
-                        onChange={(e) => setImageName(e.target.value)}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Subtitle"
-                        type="text"
-                        fullWidth
-                        value={subtitle}
-                        onChange={(e) => setSubtitle(e.target.value)}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Position"
-                        type="number"
-                        fullWidth
-                        value={position}
-                        onChange={(e) => setPosition(e.target.value)}
-                    />
-                    <FormControl fullWidth style={{ marginTop: 16 }}>
-                        <InputLabel>Categories</InputLabel>
-                        <Select
-                            multiple
-                            value={categories}
-                            onChange={(e) => setCategories(e.target.value)}
-                            renderValue={(selected) => selected.join(', ')}
-                        >
-                            {categoriesList.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    <Checkbox checked={categories.indexOf(category) > -1} />
-                                    <ListItemText primary={category} />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                            setImageFile(e.target.files[0]);
-                            setImagePreview(URL.createObjectURL(e.target.files[0]));
-                        }}
-                        style={{ marginTop: 16 }}
-                    />
-                    {imagePreview && (
-                        <img
-                            src={imagePreview}
-                            alt="Preview"
-                            style={{ width: '100%', height: '200px', marginTop: 16, objectFit: 'cover' }}
-                        />
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)} color="secondary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSave} color="primary">
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>Are you sure you want to delete this image?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDeleteConfirm} color="error">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 };

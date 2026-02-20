@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, Spin } from 'antd';
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined, CloudDownloadOutlined } from '@ant-design/icons';
 import axiosInstance from 'utils/axiosInstance';
+import { PKPHOTOGRAPHY_SERVICES } from 'constants/pkphotographyServices';
 
 const { Title } = Typography;
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [form] = Form.useForm();
@@ -88,6 +90,39 @@ const Services = () => {
     form.resetFields();
   };
 
+  // Import services from pkphotography.in list (skips existing by name)
+  const handleImportFromWebsite = async () => {
+    const existingNames = new Set((services || []).map((s) => (s.name || '').trim().toLowerCase()));
+    const toAdd = PKPHOTOGRAPHY_SERVICES.filter((s) => !existingNames.has((s.name || '').trim().toLowerCase()));
+    if (toAdd.length === 0) {
+      message.info('All services from pkphotography.in are already added.');
+      return;
+    }
+    setImporting(true);
+    let added = 0;
+    let failed = 0;
+    for (const svc of toAdd) {
+      try {
+        const formData = new FormData();
+        formData.append('name', svc.name);
+        if (svc.description) formData.append('description', svc.description);
+        if (svc.category) formData.append('category', svc.category);
+        await axiosInstance.post('/services', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        added++;
+        existingNames.add(svc.name.trim().toLowerCase());
+      } catch (err) {
+        console.error('Error adding service:', err);
+        failed++;
+      }
+    }
+    setImporting(false);
+    await fetchServices();
+    if (added > 0) message.success(`Added ${added} service(s) from pkphotography.in`);
+    if (failed > 0) message.warning(`${failed} service(s) could not be added. Check console.`);
+  };
+
   useEffect(() => {
     fetchServices();
   }, []);
@@ -146,9 +181,18 @@ const Services = () => {
         Services
       </Title>
 
-      <Button type="primary" icon={<PlusOutlined />} style={{ marginBottom: 20 }} onClick={() => setIsModalOpen(true)}>
-        Add Service
-      </Button>
+      <Space wrap style={{ marginBottom: 20 }}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+          Add Service
+        </Button>
+        <Button
+          icon={<CloudDownloadOutlined />}
+          loading={importing}
+          onClick={handleImportFromWebsite}
+        >
+          Import from pkphotography.in
+        </Button>
+      </Space>
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '100px 0' }}>
