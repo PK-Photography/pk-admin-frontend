@@ -5,12 +5,15 @@ import { Outlet } from "react-router-dom";
 import Loadable from "components/Loadable";
 import Dashboard from "layout/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminGalleryRoute from "./AdminGalleryRoute";
 import Bookings from "pages/Bookings";
 import Clients from "pages/Clients";
 import AdminManage from "pages/AdminManage";
 import HomePageCarousel from "pages/HomePageCarousel";
 import Reviews from "pages/Reviews";
 import Gallary from "pages/Gallary";
+import EditHomepageContent from "pages/EditHomepageContent";
+import EditServicePageImages from "pages/EditServicePageImages";
 import Blogs from "pages/Blogs";
 import WeddingBlogs from "pages/WeddingBlogs";
 import UserManagement from "pages/UserManagement";
@@ -69,12 +72,17 @@ const MainRoutes = {
           element: <AdminManage />,
         },
         {
-          path: "/home-page-carousel",
+          path: "home-page-carousel",
           element: <HomePageCarousel />,
         },
         {
-          path: "/manage-gallary",
-          element: <Gallary />,
+          path: "manage-gallary",
+          element: <AdminGalleryRoute />,
+          children: [
+            { index: true, element: <Gallary /> },
+            { path: "edit-homepage", element: <EditHomepageContent /> },
+            { path: "service/:serviceId", element: <EditServicePageImages /> },
+          ],
         },
         {
           path: "/blogs",
