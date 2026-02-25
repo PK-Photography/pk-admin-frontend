@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, Spin, DatePicker, Select } from 'antd';
+import { Table, Button, Modal, Form, Input, Upload, message, Space, Card, Typography, Popconfirm, DatePicker, Select } from 'antd';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import axiosInstance from 'utils/axiosInstance';
@@ -107,16 +107,29 @@ const ShaadiFilmsAlbums = () => {
 
   const columns = [
     {
+      title: 'Album ID',
+      dataIndex: '_id',
+      key: '_id',
+      width: 220,
+      render: (id) => <span style={{ fontSize: 12 }}>{id}</span>
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 220
+    },
+    {
       title: 'Preview',
       dataIndex: 'url',
       key: 'url',
       render: (url) =>
         url ? (
-          <a href={url} target="_blank" rel="noreferrer">
+          <Button type="link" href={url} target="_blank" size="small">
             View File
-          </a>
+          </Button>
         ) : (
-          <span style={{ color: '#999' }}>No File</span>
+          <span style={{ color: '#bbb' }}>No File</span>
         )
     },
     {
@@ -136,11 +149,12 @@ const ShaadiFilmsAlbums = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => handleEdit(record)}>
+          <Button type="default" size="small" onClick={() => handleEdit(record)}>
             Edit
           </Button>
+
           <Popconfirm title="Delete this album?" onConfirm={() => handleDelete(record._id)}>
-            <Button type="link" danger>
+            <Button danger size="small">
               Delete
             </Button>
           </Popconfirm>
@@ -150,47 +164,67 @@ const ShaadiFilmsAlbums = () => {
   ];
 
   return (
-    <Card style={{ margin: 20 }}>
-      <Title level={3}>ShaadiFilms Albums</Title>
+    <div style={{ padding: 24, background: '#f5f7fa', minHeight: '100vh' }}>
+      <Card
+        style={{
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+        }}
+        bodyStyle={{ padding: 24 }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 24
+          }}
+        >
+          <Title level={3} style={{ margin: 0 }}>
+            🎬 ShaadiFilms Albums
+          </Title>
 
-      <Button type="primary" icon={<PlusOutlined />} style={{ marginBottom: 20 }} onClick={() => setIsModalOpen(true)}>
-        Add Album
-      </Button>
-
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '100px 0' }}>
-          <Spin size="large" />
+          <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
+            Add Album
+          </Button>
         </div>
-      ) : (
+
+        {/* Table */}
         <Table
           columns={columns}
           dataSource={albums}
           rowKey="_id"
-          bordered
+          loading={loading}
+          scroll={{ x: 1000 }}
           pagination={{
             current: page,
             total,
             pageSize: 20,
+            showSizeChanger: false,
             onChange: (p) => setPage(p)
           }}
+          bordered={false}
+          style={{ borderRadius: 8 }}
         />
-      )}
+      </Card>
 
+      {/* Modal */}
       <Modal
-        title={editingAlbum ? 'Edit Album' : 'Add Album'}
+        title={<span style={{ fontSize: 18, fontWeight: 600}}>{editingAlbum ? 'Edit Album' : 'Create New Album'}</span>}
         open={isModalOpen}
         onCancel={handleCancel}
-        onOk={() => form.submit()}
-        okText="Save"
-        width={600}
+        footer={null}
+        width={650}
+        centered
       >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
+        <Form form={form} layout="vertical" onFinish={handleSave} style={{ marginTop: 12 }}>
           <Form.Item name="name" label="Album Name" rules={[{ required: true, message: 'Please enter album name' }]}>
-            <Input />
+            <Input size="large" placeholder="Enter album name" />
           </Form.Item>
 
           <Form.Item name="event_date" label="Event Date" rules={[{ required: true, message: 'Please select event date' }]}>
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker size="large" style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item
@@ -198,14 +232,21 @@ const ShaadiFilmsAlbums = () => {
             label={
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Select User</span>
-                <Link to="/user-management" style={{ fontSize: 13, paddingLeft: '6px' , paddingTop: '2px', textDecoration:'underline' }}>
+                <Link
+                  to="/user-management"
+                  style={{
+                    fontSize: 13,
+                    textDecoration: 'underline',
+                    padding: '2px 6px',
+                  }}
+                >
                    Create New User
                 </Link>
               </div>
             }
             rules={[{ required: true, message: 'Please select user' }]}
           >
-            <Select placeholder="Select user" showSearch optionFilterProp="children">
+            <Select size="large" placeholder="Search & select user" showSearch optionFilterProp="children">
               {users.map((user) => (
                 <Select.Option key={user.id} value={user.id}>
                   {user.fullName} ({user.email})
@@ -218,16 +259,28 @@ const ShaadiFilmsAlbums = () => {
             name="file"
             label="Upload File"
             valuePropName="fileList"
-            required={editingAlbum ? false : true}
             getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+            rules={editingAlbum ? [] : [{ required: true, message: 'Please upload a file' }]}
           >
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button icon={<UploadOutlined />}>Select File</Button>
-            </Upload>
+            <Upload.Dragger beforeUpload={() => false} maxCount={1}>
+              <p className="ant-upload-drag-icon">
+                <UploadOutlined style={{ fontSize: 24 }} />
+              </p>
+              <p>Click or drag file to upload</p>
+            </Upload.Dragger>
           </Form.Item>
+
+          <div style={{ textAlign: 'right', marginTop: 20 }}>
+            <Space>
+              <Button onClick={handleCancel}>Cancel</Button>
+              <Button type="primary" htmlType="submit">
+                {editingAlbum ? 'Update Album' : 'Create Album'}
+              </Button>
+            </Space>
+          </div>
         </Form>
       </Modal>
-    </Card>
+    </div>
   );
 };
 
