@@ -124,6 +124,14 @@ const components = {
       url: "/shadiFilms",
       icon: icons.FileDoneOutlined,
     },
+
+     {
+      id: "Wedding-pages",
+      title: "Wedding Pages",
+      type: "item",
+      url: "/weddingPages",
+      icon: icons.FileDoneOutlined,
+    },
   ],
 };
 

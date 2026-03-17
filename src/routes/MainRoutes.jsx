@@ -23,6 +23,7 @@ import SubServices from "pages/subService";
 import Talent from "pages/Talent";      
 import Favourites from "pages/favourites";    
 import ShaadiFilmsAlbums from "pages/shadiFilms";
+import WeddingPages from "pages/weddingPages";
 
 // Lazy loading of the components
 const Color = Loadable(lazy(() => import("pages/component-overview/color")));
@@ -119,6 +120,11 @@ const MainRoutes = {
         {
           path: "/shadiFilms",
           element: <ShaadiFilmsAlbums />,
+        },
+
+        {
+          path: "/weddingPages",
+          element: <WeddingPages />,
         },
 
       ],
