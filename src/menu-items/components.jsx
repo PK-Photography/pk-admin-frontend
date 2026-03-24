@@ -132,6 +132,14 @@ const components = {
       url: "/weddingPages",
       icon: icons.FileDoneOutlined,
     },
+
+     {
+      id: "cinematic-wedding",
+      title: "Cinematic Wedding Films",
+      type: "item",
+      url: "/cinematic-wedding",
+      icon: icons.BarcodeOutlined,
+    },
   ],
 };
 
