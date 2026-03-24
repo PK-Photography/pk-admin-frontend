@@ -24,6 +24,7 @@ import Talent from "pages/Talent";
 import Favourites from "pages/favourites";    
 import ShaadiFilmsAlbums from "pages/shadiFilms";
 import WeddingPages from "pages/weddingPages";
+import CinematicWeddingFilms from "pages/CinematicWeddingFilms";
 
 // Lazy loading of the components
 const Color = Loadable(lazy(() => import("pages/component-overview/color")));
@@ -125,6 +126,11 @@ const MainRoutes = {
         {
           path: "/weddingPages",
           element: <WeddingPages />,
+        },
+
+         {
+          path: "/cinematic-wedding",
+          element: <CinematicWeddingFilms />,
         },
 
       ],
