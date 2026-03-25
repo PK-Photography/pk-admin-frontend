@@ -35,7 +35,8 @@ export default function Clients() {
     canDownload: true,
     canView: true,
     pin: '',
-    url: ''
+    url: '',
+    galleryVisibility: 'both'
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
   const [jobToDelete, setJobToDelete] = useState(null); // Job to delete
@@ -93,7 +94,8 @@ export default function Clients() {
         canDownload: job.canDownload ?? true,
         canView: job.canView ?? true,
         pin: job.pin || '',
-        url: job.url || ''
+        url: job.url || '',
+        galleryVisibility: job.galleryVisibility || 'both'
       });
   
       toast.dismiss(loadingToastId);
@@ -127,6 +129,7 @@ export default function Clients() {
           image: formValues.image,
           pin: formValues.pin,
           url: formValues.url,
+          galleryVisibility: formValues.galleryVisibility
         };
 
         try {
@@ -155,7 +158,8 @@ export default function Clients() {
           date: formValues.date,
           image: formValues.image,
           pin: formValues.pin,
-          url: formValues.url
+          url: formValues.url,
+          galleryVisibility: formValues.galleryVisibility 
         };
 
         await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
