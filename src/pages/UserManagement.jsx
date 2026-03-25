@@ -36,6 +36,8 @@ export default function UserManagement() {
 
   const [openCreate, setOpenCreate] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [newUser, setNewUser] = useState({
     fullName: '',
@@ -46,8 +48,29 @@ export default function UserManagement() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    const delay = setTimeout(() => {
+      if (search.trim()) {
+        searchUsers(search);
+      } else {
+        fetchUsers();
+      }
+    }, 400);
+
+    return () => clearTimeout(delay);
+  }, [search]);
+
+  const searchUsers = async (query) => {
+    try {
+      setSearchLoading(true);
+
+      const res = await axiosInstance.get(`/user/search?q=${query}`);
+      setUsers(res.data.data);
+    } catch (error) {
+      toast.error('Error searching users');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -144,11 +167,20 @@ export default function UserManagement() {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'right',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '20px'
         }}
       >
+        <TextField
+          placeholder="Search by name, email, or ID..."
+          variant="outlined"
+          size="small"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ width: '300px' }}
+        />
+
         <Button variant="contained" color="primary" onClick={() => setOpenCreate(true)}>
           + Create User
         </Button>
@@ -169,7 +201,7 @@ export default function UserManagement() {
             </TableRow>
           </TableHead>
 
-          {loading ? (
+          {loading || searchLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
               <CircularProgress />
             </div>
