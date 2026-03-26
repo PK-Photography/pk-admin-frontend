@@ -8,14 +8,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  Typography,
-} from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography } from '@mui/material';
 import toast from 'react-hot-toast';
 import axiosInstance from 'utils/axiosInstance';
 
@@ -27,6 +20,7 @@ export default function Clients() {
   const [open, setOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState('add'); // 'add', 'edit', 'view'
   const [dialogData, setDialogData] = useState({});
+  const [usersList, setUsersList] = useState([]);
   const [formValues, setFormValues] = useState({
     name: '',
     imageUrl: null,
@@ -36,19 +30,34 @@ export default function Clients() {
     canView: true,
     pin: '',
     url: '',
-    galleryVisibility: 'both'
+    galleryVisibility: 'both',
+    users: []
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Delete confirmation dialog
   const [jobToDelete, setJobToDelete] = useState(null); // Job to delete
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [pendingCloseAction, setPendingCloseAction] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [categoryList, setCategoryList] = useState([{ name: "", images: "" }]);
+  const [categoryList, setCategoryList] = useState([{ name: '', images: '' }]);
   const [deriveLink, setDeriveLink] = useState(''); // New category image link
   const [selectedClientId, setSelectedClientId] = useState('');
   useEffect(() => {
     fetchNews(page, rowsPerPage);
   }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get('/user/all');
+      setUsersList(res.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast.error('Failed to fetch users');
+    }
+  };
 
   const fetchNews = (page, rowsPerPage) => {
     axiosInstance
@@ -76,15 +85,15 @@ export default function Clients() {
 
   const handleClickOpen = (mode, job = {}) => {
     const loadingToastId = toast.loading('🖐️Hold on 🎁 Loading...');
-  
+
     setDialogMode(mode);
     setDialogData(job);
-  
-    if (mode === "editOrder" && job._id) {
+
+    if (mode === 'editOrder' && job._id) {
       setSelectedClientId(job._id);
-      setCategoryList(job.category || [{ name: "", images: "" }]); // ✅ set category list here
+      setCategoryList(job.category || [{ name: '', images: '' }]); // ✅ set category list here
     }
-  
+
     setTimeout(() => {
       setFormValues({
         name: job.name || '',
@@ -95,9 +104,10 @@ export default function Clients() {
         canView: job.canView ?? true,
         pin: job.pin || '',
         url: job.url || '',
-        galleryVisibility: job.galleryVisibility || 'both'
+        galleryVisibility: job.galleryVisibility || 'both',
+        users: job.users?.map((u) => u.id || u) || [] 
       });
-  
+
       toast.dismiss(loadingToastId);
       setOpen(true);
     }, 100);
@@ -129,28 +139,26 @@ export default function Clients() {
           image: formValues.image,
           pin: formValues.pin,
           url: formValues.url,
-          galleryVisibility: formValues.galleryVisibility
+          galleryVisibility: formValues.galleryVisibility,
+          users: formValues.users
         };
 
         try {
           await axiosInstance.post('/upload', cardData);
           toast.success('News Posted Successfully!🎉');
         } catch (error) {
-          const msg =
-            error.response?.data?.message ||
-            error.response?.data?.error ||
-            "Unknown error";
-        
+          const msg = error.response?.data?.message || error.response?.data?.error || 'Unknown error';
+
           toast.error(`Error: ${msg}`);
-        
-          if (msg.toLowerCase().includes("already exists")) {
+
+          if (msg.toLowerCase().includes('already exists')) {
             setFormValues((prev) => ({
               ...prev,
-              name: "",
+              name: ''
             }));
           }
-        
-          console.error("Error submitting the form:", error);
+
+          console.error('Error submitting the form:', error);
         }
       } else if (dialogMode === 'edit') {
         const cardData = {
@@ -159,7 +167,8 @@ export default function Clients() {
           image: formValues.image,
           pin: formValues.pin,
           url: formValues.url,
-          galleryVisibility: formValues.galleryVisibility 
+          galleryVisibility: formValues.galleryVisibility,
+          users: formValues.users 
         };
 
         await axiosInstance.put(`/card/update/${dialogData._id}`, cardData, {
@@ -168,15 +177,15 @@ export default function Clients() {
         toast.success('News Edited Successfully!🖊️😍');
       } else if (dialogMode === 'editOrder') {
         if (!selectedClientId) {
-          toast.error("No client selected!");
+          toast.error('No client selected!');
           return;
         }
-      
+
         await axiosInstance.put('/cards/update-category', {
           id: selectedClientId,
           category: categoryList
         });
-      
+
         toast.success('Category updated Successfully!🖊️😍');
       }
 
@@ -216,18 +225,18 @@ export default function Clients() {
 
   const handleCategoryDelete = async (categoryId) => {
     try {
-      await axiosInstance.put("/cards/delete-category", {
+      await axiosInstance.put('/cards/delete-category', {
         cardId: selectedClientId,
-        categoryId: categoryId,
+        categoryId: categoryId
       });
-  
-      toast.success("Category deleted successfully");
-  
+
+      toast.success('Category deleted successfully');
+
       // Optimistically update local state
       setCategoryList((prev) => prev.filter((cat) => cat._id !== categoryId));
     } catch (error) {
-      console.error("Failed to delete category", error);
-      toast.error("Failed to delete category");
+      console.error('Failed to delete category', error);
+      toast.error('Failed to delete category');
     }
   };
 
@@ -323,6 +332,7 @@ export default function Clients() {
               onSubmit={handleSubmit}
               formValues={formValues}
               setFormValues={setFormValues}
+              usersList={usersList}
             />
           )}
         </DialogContent>

@@ -10,10 +10,12 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Autocomplete,
+  Checkbox
 } from '@mui/material';
 
-const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) => {
+const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues, usersList }) => {
   const handleInputChange = (field) => (e) => {
     setFormValues((prev) => ({ ...prev, [field]: e.target.value }));
   };
@@ -112,6 +114,33 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
             <MenuItem value="none">Don’t Show</MenuItem>
           </Select>
         </FormControl>
+
+        <br />
+        <br />
+        <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>Select Users</label>
+
+        <Autocomplete
+          multiple
+          options={usersList}
+          getOptionLabel={(option) => `${option.fullName || option.name || 'User'} (${option.email})`}
+          value={usersList.filter(
+            (user) => formValues.users?.includes(user.id) 
+          )}
+          onChange={(e, newValue) => {
+            setFormValues((prev) => ({
+              ...prev,
+              users: newValue.map((user) => user.id) 
+            }));
+          }}
+          disableCloseOnSelect
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox style={{ marginRight: 8 }} checked={selected} />
+              {option.email}
+            </li>
+          )}
+          renderInput={(params) => <TextField {...params} label="Select Users" placeholder="Search users..." />}
+        />
 
         <br />
         <br />
