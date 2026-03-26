@@ -6,7 +6,11 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  TextField
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 
 const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) => {
@@ -29,7 +33,8 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
           required
         />
 
-        <br /><br />
+        <br />
+        <br />
         <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>PIN</label>
         <TextField
           margin="dense"
@@ -47,7 +52,8 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
           }}
         />
 
-        <br /><br />
+        <br />
+        <br />
         <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>URL</label>
         <TextField
           margin="dense"
@@ -59,7 +65,8 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
           onChange={handleInputChange('url')}
         />
 
-        <br /><br />
+        <br />
+        <br />
         <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>Upload Image</label>
         <br />
         <input
@@ -83,9 +90,33 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
           required
         />
 
-        <br /><br />
+        <br />
+        <br />
+        <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>Gallery Visibility</label>
+
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Gallery Visibility</InputLabel>
+          <Select
+            value={formValues.galleryVisibility || 'both'}
+            label="Gallery Visibility"
+            onChange={(e) =>
+              setFormValues((prev) => ({
+                ...prev,
+                galleryVisibility: e.target.value
+              }))
+            }
+          >
+            <MenuItem value="pikconnect">Pikconnect</MenuItem>
+            <MenuItem value="pk_photography">PK Photography</MenuItem>
+            <MenuItem value="both">Both</MenuItem>
+            <MenuItem value="none">Don’t Show</MenuItem>
+          </Select>
+        </FormControl>
+
+        <br />
+        <br />
         <label style={{ fontSize: '15px', color: '#008080', fontWeight: 'bolder' }}>Date</label>
-        <br/>
+        <br />
         <TextField
           margin="dense"
           type="date"
@@ -98,12 +129,7 @@ const AddClientModal = ({ open, onClose, onSubmit, formValues, setFormValues }) 
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={onSubmit}
-          color="primary"
-          variant="contained"
-          disabled={!formValues.name.trim()}
-        >
+        <Button onClick={onSubmit} color="primary" variant="contained" disabled={!formValues.name.trim()}>
           Add
         </Button>
       </DialogActions>
