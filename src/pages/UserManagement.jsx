@@ -39,12 +39,32 @@ export default function UserManagement() {
   const [search, setSearch] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
 
+  const [openBookings, setOpenBookings] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [bookingLoading, setBookingLoading] = useState(false);
+
   const [newUser, setNewUser] = useState({
     fullName: '',
     mobileNo: '',
     email: '',
     password: ''
   });
+
+  const handleViewBookings = async (user) => {
+    try {
+      setSelectedUser(user);
+      setBookingLoading(true);
+      setOpenBookings(true);
+
+      const res = await axiosInstance.get(`/booking/phone/${user.mobileNo}`);
+
+      setBookings(res.data.data || []);
+    } catch (error) {
+      toast.error('Error fetching bookings');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -197,6 +217,7 @@ export default function UserManagement() {
               <TableCell style={{ color: '#fff' }}>Joined at</TableCell>
               <TableCell style={{ color: '#fff' }}>Role</TableCell>
               <TableCell style={{ color: '#fff' }}>View Favourites</TableCell>
+              <TableCell style={{ color: '#fff' }}>View Bookings</TableCell>
               <TableCell style={{ color: 'red' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -239,6 +260,12 @@ export default function UserManagement() {
 
                   <TableCell>
                     <Button variant="outlined" color="primary" onClick={() => handleViewFavourites(user)}>
+                      View
+                    </Button>
+                  </TableCell>
+
+                  <TableCell>
+                    <Button variant="outlined" color="primary" onClick={() => handleViewBookings(user)}>
                       View
                     </Button>
                   </TableCell>
@@ -363,6 +390,79 @@ export default function UserManagement() {
             >
               {createLoading ? <CircularProgress size={20} /> : 'Create User'}
             </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openBookings}
+          onClose={() => {
+            setOpenBookings(false);
+            setBookings([]);
+            setSelectedUser(null);
+          }}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>Bookings for {selectedUser?.fullName || selectedUser?.name}</DialogTitle>
+
+          <DialogContent dividers sx={{ maxHeight: '450px' }}>
+            {bookingLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <CircularProgress />
+              </div>
+            ) : bookings.length === 0 ? (
+              <Typography>No bookings found</Typography>
+            ) : (
+              bookings.map((booking, index) => (
+                <div
+                  key={booking._id || index}
+                  style={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    marginBottom: '12px'
+                  }}
+                >
+                  <Typography>
+                    <b>ID:</b> {booking._id}
+                  </Typography>
+                  <Typography>
+                    <b>Name:</b> {booking.name || '-'}
+                  </Typography>
+                  <Typography>
+                    <b>Email:</b> {booking.email || '-'}
+                  </Typography>
+                  <Typography>
+                    <b>Phone:</b> {booking.phone || '-'}
+                  </Typography>
+                  <Typography>
+                    <b>Address:</b> {booking.address || '-'}
+                  </Typography>
+                  <Typography>
+                    <b>Service:</b> {booking.service || '-'}
+                  </Typography>
+                  <Typography>
+                    <b>Message:</b> {booking.message || '-'}
+                  </Typography>
+
+                  <Typography>
+                    <b>Date:</b> {booking.date ? new Date(booking.date).toLocaleDateString() : '-'}
+                  </Typography>
+
+                  <Typography>
+                    <b>Time:</b> {booking.time || '-'}
+                  </Typography>
+
+                  <Typography>
+                    <b>Created At:</b> {booking.createdAt ? new Date(booking.createdAt).toLocaleString() : '-'}
+                  </Typography>
+                </div>
+              ))
+            )}
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setOpenBookings(false)}>Close</Button>
           </DialogActions>
         </Dialog>
       </TableContainer>
