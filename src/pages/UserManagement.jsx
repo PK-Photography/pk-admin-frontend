@@ -259,9 +259,17 @@ export default function UserManagement() {
                   </TableCell>
 
                   <TableCell>
-                    <Button variant="outlined" color="primary" onClick={() => handleViewFavourites(user)}>
-                      View
-                    </Button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {user.favourite?.length > 0 ? (
+                        <span style={{ color: 'green', fontWeight: 'bold', whiteSpace: 'nowrap' }}>✔ {user.favourite.length}</span>
+                      ) : (
+                        <span style={{ color: '#aaa', whiteSpace: 'nowrap' }}>0</span>
+                      )}
+
+                      <Button variant="outlined" color="primary" size="small" onClick={() => handleViewFavourites(user)}>
+                        View
+                      </Button>
+                    </div>
                   </TableCell>
 
                   <TableCell>
