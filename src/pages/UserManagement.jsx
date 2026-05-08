@@ -43,12 +43,38 @@ export default function UserManagement() {
   const [bookings, setBookings] = useState([]);
   const [bookingLoading, setBookingLoading] = useState(false);
 
+  const [showOnlyFavourites, setShowOnlyFavourites] = useState(false);
+  const [showOnlyBookings, setShowOnlyBookings] = useState(false);
+  const [bookingPhones, setBookingPhones] = useState(new Set());
+  const [bookingFilterLoading, setBookingFilterLoading] = useState(false);
+
   const [newUser, setNewUser] = useState({
     fullName: '',
     mobileNo: '',
     email: '',
     password: ''
   });
+
+  const handleToggleBookingsFilter = async () => {
+    if (!showOnlyBookings) {
+      try {
+        setBookingFilterLoading(true);
+
+        const res = await axiosInstance.get('/booking/all');
+
+        const phones = res.data?.data?.map((b) => b.phone);
+
+        setBookingPhones(new Set(phones)); // fast lookup
+        setShowOnlyBookings(true);
+      } catch (error) {
+        toast.error('Error fetching bookings');
+      } finally {
+        setBookingFilterLoading(false);
+      }
+    } else {
+      setShowOnlyBookings(false);
+    }
+  };
 
   const handleViewBookings = async (user) => {
     try {
@@ -216,8 +242,52 @@ export default function UserManagement() {
               <TableCell style={{ color: '#fff' }}>isverify</TableCell>
               <TableCell style={{ color: '#fff' }}>Joined at</TableCell>
               <TableCell style={{ color: '#fff' }}>Role</TableCell>
-              <TableCell style={{ color: '#fff' }}>View Favourites</TableCell>
-              <TableCell style={{ color: '#fff' }}>View Bookings</TableCell>
+              <TableCell style={{ color: '#fff' }}>
+                <Button
+                  size="small"
+                  onClick={() => setShowOnlyFavourites((prev) => !prev)}
+                  sx={{
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.6)',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    borderRadius: '6px',
+                    px: 1.5,
+                    py: 0.5,
+                    minWidth: 'auto',
+                    backgroundColor: showOnlyFavourites ? 'rgba(255,255,255,0.2)' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.3)',
+                      borderColor: '#fff'
+                    }
+                  }}
+                >
+                  {showOnlyFavourites ? 'Favourites ✓' : 'Favourites'}
+                </Button>
+              </TableCell>
+              <TableCell style={{ color: '#fff' }}>
+                <Button
+                  size="small"
+                  onClick={handleToggleBookingsFilter}
+                  sx={{
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.6)',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    borderRadius: '6px',
+                    px: 1.5,
+                    py: 0.5,
+                    minWidth: 'auto',
+                    backgroundColor: showOnlyBookings ? 'rgba(255,255,255,0.2)' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.3)',
+                      borderColor: '#fff'
+                    }
+                  }}
+                >
+                  {bookingFilterLoading ? 'Loading...' : showOnlyBookings ? 'Bookings ✓' : 'Bookings'}
+                </Button>
+              </TableCell>
               <TableCell style={{ color: 'red' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -228,67 +298,74 @@ export default function UserManagement() {
             </div>
           ) : (
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.fullName || user.name || '-'}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.mobileNo || '-'}</TableCell>
-                  <TableCell>{user.isverify ? 'YES' : 'NO' || '-'}</TableCell>
-                  <TableCell>
-                    {user.createdAt
-                      ? new Date(user.createdAt).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
+              {users
+                .filter((user) => {
+                  const hasFavourites = user.favourite?.length > 0;
+                  const hasBooking = bookingPhones.has(user.mobileNo);
 
-                          hour12: true
-                        })
-                      : '-'}
-                  </TableCell>
+                  return (showOnlyFavourites ? hasFavourites : true) && (showOnlyBookings ? hasBooking : true);
+                })
+                .map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.fullName || user.name || '-'}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.mobileNo || '-'}</TableCell>
+                    <TableCell>{user.isverify ? 'YES' : 'NO' || '-'}</TableCell>
+                    <TableCell>
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
 
-                  <TableCell>
-                    <Select value={user.role} onChange={(e) => handleRoleChange(user, e.target.value)}>
-                      {roles.map((role) => (
-                        <MenuItem key={role} value={role}>
-                          {role}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </TableCell>
+                            hour12: true
+                          })
+                        : '-'}
+                    </TableCell>
 
-                  <TableCell>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {user.favourite?.length > 0 ? (
-                        <span style={{ color: 'green', fontWeight: 'bold', whiteSpace: 'nowrap' }}>✔ {user.favourite.length}</span>
-                      ) : (
-                        <span style={{ color: '#aaa', whiteSpace: 'nowrap' }}>0</span>
-                      )}
+                    <TableCell>
+                      <Select value={user.role} onChange={(e) => handleRoleChange(user, e.target.value)}>
+                        {roles.map((role) => (
+                          <MenuItem key={role} value={role}>
+                            {role}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </TableCell>
 
-                      <Button variant="outlined" color="primary" size="small" onClick={() => handleViewFavourites(user)}>
+                    <TableCell>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {user.favourite?.length > 0 ? (
+                          <span style={{ color: 'green', fontWeight: 'bold', whiteSpace: 'nowrap' }}>✔ {user.favourite.length}</span>
+                        ) : (
+                          <span style={{ color: '#aaa', whiteSpace: 'nowrap' }}>0</span>
+                        )}
+
+                        <Button variant="outlined" color="primary" size="small" onClick={() => handleViewFavourites(user)}>
+                          View
+                        </Button>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <Button variant="outlined" color="primary" onClick={() => handleViewBookings(user)}>
                         View
                       </Button>
-                    </div>
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell>
-                    <Button variant="outlined" color="primary" onClick={() => handleViewBookings(user)}>
-                      View
-                    </Button>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography
-                      variant="h6"
-                      onClick={() => handleOpenBanDialog(user)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'red', cursor: 'pointer' }}
-                    >
-                      <FaBan style={{ fontSize: '15px' }} /> Ban user
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell>
+                      <Typography
+                        variant="h6"
+                        onClick={() => handleOpenBanDialog(user)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'red', cursor: 'pointer' }}
+                      >
+                        <FaBan style={{ fontSize: '15px' }} /> Ban user
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           )}
         </Table>
