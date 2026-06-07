@@ -1,17 +1,8 @@
 import React from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Switch,
-  TablePagination
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Switch, TablePagination } from '@mui/material';
 import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { styled } from '@mui/material/styles';
+import { Chip, Stack } from '@mui/material';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${TableCell.head}`]: {
@@ -61,6 +52,7 @@ const ClientTable = ({
             <StyledTableCell align="right">Img</StyledTableCell>
             <StyledTableCell align="right">Download</StyledTableCell>
             <StyledTableCell align="right">View</StyledTableCell>
+            <StyledTableCell align="center">Links</StyledTableCell>
             <StyledTableCell align="right">Actions</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -88,21 +80,34 @@ const ClientTable = ({
                   onClick={() => handleClickOpen('editOrder', job)}
                 />
               </StyledTableCell>
+              <StyledTableCell align="right">{new Date(job.updatedAt).toLocaleDateString('en-US')}</StyledTableCell>
               <StyledTableCell align="right">
-                {new Date(job.updatedAt).toLocaleDateString('en-US')}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                <img
-                  src={job.imageUrl}
-                  alt="Job Image"
-                  style={{ maxWidth: '100px', height: 'auto' }}
-                />
+                <img src={job.imageUrl} alt="Job Image" style={{ maxWidth: '100px', height: 'auto' }} />
               </StyledTableCell>
               <StyledTableCell align="right">
                 <Switch checked={job.canDownload} onChange={() => handleCanDownloadStatus(job)} />
               </StyledTableCell>
               <StyledTableCell align="right">
                 <Switch checked={job.canView} onChange={() => handleCanViewStatus(job)} />
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                <Stack direction="row" spacing={1} justifyContent="center">
+                  <Chip
+                    label="PK"
+                    size="small"
+                    clickable
+                    color="primary"
+                    onClick={() => window.open(`https://pkphotography.in/client/${encodeURIComponent(job.name)}`, '_blank')}
+                  />
+
+                  <Chip
+                    label="PIK"
+                    size="small"
+                    clickable
+                    color="secondary"
+                    onClick={() => window.open(`https://www.pikconnect.com/galleries/${encodeURIComponent(job.name)}`, '_blank')}
+                  />
+                </Stack>
               </StyledTableCell>
               <StyledTableCell align="right">
                 <EyeOutlined
@@ -113,10 +118,7 @@ const ClientTable = ({
                   style={{ cursor: 'pointer', fontSize: '20px', color: 'blue', marginRight: '8px' }}
                   onClick={() => handleClickOpen('edit', job)}
                 />
-                <DeleteOutlined
-                  style={{ cursor: 'pointer', fontSize: '20px', color: 'red' }}
-                  onClick={() => handleDeleteDialogOpen(job)}
-                />
+                <DeleteOutlined style={{ cursor: 'pointer', fontSize: '20px', color: 'red' }} onClick={() => handleDeleteDialogOpen(job)} />
               </StyledTableCell>
             </StyledTableRow>
           ))}
